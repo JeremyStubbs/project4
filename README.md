@@ -14,7 +14,8 @@ https://jeremystubbs.github.io/Project4
 
 - A main character who the user can make move left, right, up, and down through the webpage and swing a battle axe.
 - A forrest background that the main character can interact with
-- An enemy controlled by artificial intelligence with whom the main character can interact
+- An enemy controlled with whom the main character can interact
+- Hit points for main character and enemy
 
 #### PostMVP
 
@@ -22,6 +23,7 @@ https://jeremystubbs.github.io/Project4
 - An inventory and loot
 - Multiple levels
 - Multiple enemies
+- AI for enemy
 
 ## Components
 
