@@ -12,7 +12,7 @@ let playerX = 220;
 let playerY = 220;
 let playerVector = 0;
 let playerGameFrame = 8;
-let playerState = 'walkright';
+let playerState = 'idleleft';
 const playerStaggerFrames = 8;
 const playerSpriteAnimations = [];
 const playerAnimationStates = [
@@ -104,37 +104,65 @@ window.addEventListener(
 		}
 		if (event.key == 'w') {
 			playerY -= 10;
+			if (playerVector == 'left') {
+				playerState = 'walkleft';
+			}
+			if (playerVector == 'right') {
+				playerState = 'walkright';
+			}
 		}
 		if (event.key == 's') {
 			playerY += 10;
+			if (playerVector == 'left') {
+				playerState = 'walkleft';
+			}
+			if (playerVector == 'right') {
+				playerState = 'walkright';
+			}
 		}
 		if (event.key == 'a') {
 			playerX -= 10;
 			playerState = 'walkleft';
+			playerVector = 'left';
 		}
 		if (event.key == 'd') {
 			playerX += 10;
 			playerState = 'walkright';
+			playerVector = 'right';
 		}
 		if (event.key == 'W') {
 			playerY -= 10;
+			if (playerVector == 'left') {
+				playerState = 'walkleft';
+			}
+			if (playerVector == 'right') {
+				playerState = 'walkright';
+			}
 		}
 		if (event.key == 'S') {
 			playerY += 10;
+			if (playerVector == 'left') {
+				playerState = 'walkleft';
+			}
+			if (playerVector == 'right') {
+				playerState = 'walkright';
+			}
 		}
 		if (event.key == 'A') {
 			playerX -= 10;
 			playerState = 'walkleft';
+			playerVector = 'left';
 		}
 		if (event.key == 'D') {
 			playerX += 10;
 			playerState = 'walkright';
+			playerVector = 'left';
 		}
 		if (event.key == 'Enter') {
-			if (playerState == 'walkleft') {
+			if (playerVector == 'left') {
 				playerState = 'attackleft';
 			}
-			if (playerState == 'walkright') {
+			if (playerVector == 'right') {
 				playerState = 'attackright';
 			}
 		}
@@ -143,3 +171,12 @@ window.addEventListener(
 	},
 	true
 );
+
+window.addEventListener('keyup', function (event) {
+	if (playerVector == 'left') {
+		playerState = 'idleleft';
+	}
+	if (playerVector == 'right') {
+		playerState = 'idleright';
+	}
+});
