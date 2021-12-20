@@ -10,9 +10,9 @@ const playerSpriteWidth = 32;
 const playerSpriteHeight = 32;
 let playerX = 220;
 let playerY = 220;
+let playerVector = 0;
 let playerGameFrame = 8;
-let playerState = 'idleleft';
-let previousPlayerState = 'idleleft';
+let playerState = 'walkright';
 const playerStaggerFrames = 8;
 const playerSpriteAnimations = [];
 const playerAnimationStates = [
@@ -102,84 +102,42 @@ window.addEventListener(
 		if (event.defaultPrevented) {
 			return; // Do nothing if the event was already processed
 		}
-		switch (event.key) {
-			case 's':
-				playerY += 10;
-				if (playerState == 'walkleft' || playerState == 'idleleft') {
-					playerState = 'idleleft';
-				}
-				if (playerState == 'walkright' || playerState == 'idleright') {
-					playerState = 'walkright';
-				}
-				break;
-
-			case 'S':
-				playerY += 10;
-				if (playerState == 'walkleft' || playerState == 'idleleft') {
-					playerState = 'idleleft';
-				}
-				if (playerState == 'walkright' || playerState == 'idleright') {
-					playerState = 'walkright';
-				}
-				break;
-
-			case 'w':
-				playerY += -10;
-				if (playerState == 'walkleft' || playerState == 'idleleft') {
-					playerState = 'idleleft';
-				}
-				if (playerState == 'walkright' || playerState == 'idleright') {
-					playerState = 'walkright';
-				}
-				break;
-
-			case 'W':
-				playerY += -10;
-				if (playerState == 'walkleft' || playerState == 'idleleft') {
-					playerState = 'idleleft';
-				}
-				if (playerState == 'walkright' || playerState == 'idleright') {
-					playerState = 'walkright';
-				}
-				break;
-
-			case 'a':
-				playerX += -10;
-				playerState == 'walkleft';
-				break;
-
-			case 'A':
-				playerX += -10;
-				playerState == 'walkleft';
-				break;
-
-			case 'd':
-				playerX += 10;
-				playerState == 'walkright';
-				break;
-
-			case 'D':
-				playerX += 10;
-				playerState == 'walkright';
-				break;
-
-			case 'Enter':
-				if (playerState == 'walkleft' || playerState == 'idleleft') {
-					playerState = 'attackleft';
-				}
-				if (playerState == 'walkright' || playerState == 'idleright') {
-					playerState = 'attackright';
-				}
-				break;
-			// case 'Esc': // IE/Edge specific value
-			// case 'Escape':
-			// 	stopDancing();
-			// 	break;
-			default:
-				playerState = 'idleright';
-				return; // Quit when this doesn't handle the key event.
+		if (event.key == 'w') {
+			playerY -= 10;
 		}
-
+		if (event.key == 's') {
+			playerY += 10;
+		}
+		if (event.key == 'a') {
+			playerX -= 10;
+			playerState = 'walkleft';
+		}
+		if (event.key == 'd') {
+			playerX += 10;
+			playerState = 'walkright';
+		}
+		if (event.key == 'W') {
+			playerY -= 10;
+		}
+		if (event.key == 'S') {
+			playerY += 10;
+		}
+		if (event.key == 'A') {
+			playerX -= 10;
+			playerState = 'walkleft';
+		}
+		if (event.key == 'D') {
+			playerX += 10;
+			playerState = 'walkright';
+		}
+		if (event.key == 'Enter') {
+			if (playerState == 'walkleft') {
+				playerState = 'attackleft';
+			}
+			if (playerState == 'walkright') {
+				playerState = 'attackright';
+			}
+		}
 		// Cancel the default action to avoid it being handled twice
 		event.preventDefault();
 	},
