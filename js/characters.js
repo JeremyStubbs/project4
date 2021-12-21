@@ -145,7 +145,7 @@ const enemy = new Character(
 			frames: 1,
 		},
 	],
-	1,
+	0.5,
 	100,
 	0,
 	8

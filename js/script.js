@@ -133,25 +133,11 @@ function animateGame() {
 		enemy.state = 'dead';
 	}
 
-	let enemy_temp_speed = enemy.speed;
+	let enemy_temp_speed = temp_speed * enemy.speed;
 	//check if not already dead
 	if (enemy.state != 'dead') {
 		//will pursue player when distance less than 200 px
 		if (distance < 200) {
-			//correct enemy speed for map movement and diagonal
-			if (
-				(player.walkingUp == true || player.walkingDown == true) &&
-				(player.walkingRight == true || player.walkingLeft == true)
-			) {
-				enemy_temp_speed = enemy_temp_speed / 1.41;
-			}
-			if (
-				(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
-				(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
-			) {
-				enemy_temp_speed = enemy_temp_speed / 2;
-			}
-			//enemy movements
 			if (deltaY > -2) {
 				enemy.positionY += enemy_temp_speed;
 			}
