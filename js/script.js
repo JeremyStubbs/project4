@@ -4,8 +4,16 @@ const ctx = canvas.getContext('2d');
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
-image = new Image();
-image.src = 'img/map.png';
+class Map {
+	constructor(imgSRC, positionX, positionY) {
+		this.image = new Image();
+		this.image.src = imgSRC;
+		this.positionX = positionX;
+		this.positionY = positionY;
+	}
+}
+
+map = new Map('img/map.png', 242, 116);
 
 function animateGame() {
 	//Check if attacking and decrease hit points appropriately
@@ -36,36 +44,6 @@ function animateGame() {
 	//clear canvas
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	//set map coordinates
-	let y = player.positionY;
-	if (player.positionY > 116) {
-		y = 116;
-	} else if (player.positionY < 0) {
-		y = 0;
-	}
-
-	let x = player.positionX;
-	if (player.positionX > 242) {
-		x = 242;
-	} else if (player.positionX < 0) {
-		x = 0;
-	}
-	//545x416
-	console.log(player.positionX, player.positionY, x, y);
-
-	//render map
-	ctx.drawImage(
-		image,
-		x,
-		y,
-		image.width,
-		image.height,
-		0,
-		0,
-		image.width * 2,
-		image.height * 2
-	);
-
 	//set animations
 	let playerSpritePosition =
 		Math.floor(player.gameFrame / player.staggerFrames) %
@@ -81,6 +59,11 @@ function animateGame() {
 	let enemyFrameY =
 		enemy.spriteAnimations[enemy.state].loc[enemySpritePosition].y;
 
+	//enemy dies when hit points below 0
+	if (enemy.hitPoints <= 0) {
+		enemy.state = 'dead';
+	}
+
 	//speed corrections for diagonal and when map moves
 	let temp_speed = player.speed;
 	if (
@@ -88,12 +71,6 @@ function animateGame() {
 		(player.walkingRight == true || player.walkingLeft == true)
 	) {
 		temp_speed = temp_speed / 1.41;
-	}
-	if (
-		(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
-		(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
-	) {
-		temp_speed = temp_speed / 2;
 	}
 
 	//player can't go out of bounds
@@ -110,16 +87,16 @@ function animateGame() {
 		player.positionY = 540;
 	}
 	//player movements
-	if (player.walkingUp == true) {
+	if (player.walkingUp == true && player.positionY > 89) {
 		player.positionY -= temp_speed;
 	}
-	if (player.walkingDown == true) {
+	if (player.walkingDown == true && player.positionY < 451) {
 		player.positionY += temp_speed;
 	}
-	if (player.walkingRight == true) {
+	if (player.walkingRight == true && player.positionX < 461) {
 		player.positionX += temp_speed;
 	}
-	if (player.walkingLeft == true) {
+	if (player.walkingLeft == true && player.positionX > 89) {
 		player.positionX -= temp_speed;
 	}
 
@@ -128,11 +105,7 @@ function animateGame() {
 	deltaY = player.positionY - enemy.positionY;
 	distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-	//enemy dies when hit points below 0
-	if (enemy.hitPoints <= 0) {
-		enemy.state = 'dead';
-	}
-
+	//set enemy speed
 	let enemy_temp_speed = temp_speed * enemy.speed;
 	//check if not already dead
 	if (enemy.state != 'dead') {
@@ -152,6 +125,35 @@ function animateGame() {
 			}
 		}
 	}
+
+	//map movement
+	if (player.positionX < 90 && player.walkingLeft && map.positionX > -50) {
+		map.positionX -= temp_speed;
+	}
+	if (player.positionX > 460 && player.walkingRight && map.positionX < 292) {
+		map.positionX += temp_speed;
+	}
+	if (player.positionY < 90 && player.walkingUp && map.positionY > -54) {
+		map.positionY -= temp_speed;
+	}
+
+	if (player.positionY > 450 && player.walkingDown && map.positionY < 156) {
+		map.positionY += temp_speed;
+	}
+	// console.log(player.positionX, player.positionY, map.positionX, map.positionY);
+
+	//render map
+	ctx.drawImage(
+		map.image,
+		map.positionX,
+		map.positionY,
+		map.image.width,
+		map.image.height,
+		0,
+		0,
+		map.image.width * 2,
+		map.image.height * 2
+	);
 
 	//render player and enemy
 	ctx.drawImage(
@@ -178,12 +180,15 @@ function animateGame() {
 		enemy.spriteHeight
 	);
 
+	//increase gameFrames (used for sprite animations)
 	player.gameFrame++;
 	enemy.gameFrame++;
+
+	//recursively call animations
 	requestAnimationFrame(animateGame);
 }
 
-//call animation
+//call animations
 animateGame();
 
 //keydown inputs for player movement and attacks
@@ -258,7 +263,7 @@ window.addEventListener(
 				player.beenAttacking = true;
 				player.state = 'attackright';
 			}
-			console.log(enemy.hitPoints);
+			// console.log(enemy.hitPoints);
 		}
 		// Cancel the default action to avoid it being handled twice
 		event.preventDefault();
@@ -280,3 +285,43 @@ window.addEventListener('keyup', function (event) {
 		player.state = 'idleright';
 	}
 });
+
+//set map coordinates
+// map.positionX = player.positionX;
+// if (player.positionX > 242) {
+// 	map.positionX = 242;
+// } else if (player.positionX < 0) {
+// 	map.positionX = 0;
+// }
+
+// map.positionY = player.positionY;
+// if (player.positionY > 116) {
+// 	map.positionY = 116;
+// } else if (player.positionY < 0) {
+// 	map.positionY = 0;
+// }
+
+//545x416
+//550x540
+//90,460, 90,450
+// console.log(player.positionX, player.positionY, map.positionX, map.positionY);
+
+//render map
+// ctx.drawImage(
+// 	map.image,
+// 	map.positionX,
+// 	map.positionY,
+// 	map.image.width,
+// 	map.image.height,
+// 	0,
+// 	0,
+// 	map.image.width * 2,
+// 	map.image.height * 2
+// );
+
+// if (
+// 	(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
+// 	(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
+// ) {
+// 	temp_speed = temp_speed / 2;
+// }

@@ -49,7 +49,7 @@ class Character {
 			}
 			this.spriteAnimations[state.name] = frames;
 		});
-		console.log(player.state);
+		// console.log(player.state);
 	}
 }
 
@@ -57,8 +57,8 @@ const player = new Character(
 	'img/dwarf.png',
 	64,
 	64,
-	220,
-	220,
+	211,
+	454,
 	'right',
 	'idleleft',
 	8,
