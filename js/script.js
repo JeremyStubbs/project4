@@ -1,170 +1,14 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-let WIDTH = 600;
-let HEIGHT = 600;
+
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
-const TILE_SIZE = 32;
-class Character {
-	constructor(
-		imgSRC,
-		spriteWidth,
-		spriteHeight,
-		positionX,
-		positionY,
-		vector,
-		state,
-		staggerFrames,
-		spriteAnimations,
-		animationStates,
-		speed,
-		hitPoints,
-		experience,
-		gameFrame
-	) {
-		this.characterImage = new Image();
-		this.characterImage.src = imgSRC;
-		this.spriteWidth = spriteWidth;
-		this.spriteHeight = spriteHeight;
-		this.positionX = positionX;
-		this.positionY = positionY;
-		this.vector = vector;
-		this.state = state;
-		this.staggerFrames = staggerFrames;
-		this.spriteAnimations = spriteAnimations;
-		this.animationStates = animationStates;
-		this.speed = speed;
-		this.hitPoints = hitPoints;
-		this.experience = experience;
-		this.walkingLeft = false;
-		this.walkingRight = false;
-		this.walkingUp = false;
-		this.walkingDown = false;
-		this.gameFrame = gameFrame;
-		this.beenAttacking = false;
-		this.attackCounter = 0;
-	}
-	initialize() {
-		this.animationStates.forEach((state, index) => {
-			let frames = {
-				loc: [],
-			};
-			for (let j = 0; j < state.frames; j++) {
-				let positionX = j * this.spriteWidth;
-				let positionY = index * this.spriteHeight;
-				frames.loc.push({ x: positionX, y: positionY });
-			}
-			this.spriteAnimations[state.name] = frames;
-		});
-		console.log(player.state);
-	}
-}
-
-const player = new Character(
-	'img/dwarf.png',
-	64,
-	64,
-	220,
-	220,
-	'right',
-	'idleleft',
-	8,
-	[],
-	[
-		{
-			name: 'idleright',
-			frames: 1,
-		},
-		{
-			name: 'walkright',
-			frames: 8,
-		},
-		{
-			name: 'attackright',
-			frames: 7,
-		},
-		{
-			name: 'useless',
-			frames: 1,
-		},
-		{
-			name: 'dieright',
-			frames: 7,
-		},
-		{
-			name: 'idleleft',
-			frames: 1,
-		},
-		{
-			name: 'walkleft',
-			frames: 8,
-		},
-		{
-			name: 'attackleft',
-			frames: 7,
-		},
-		{
-			name: 'useless',
-			frames: 1,
-		},
-		{
-			name: 'dieleft',
-			frames: 7,
-		},
-	],
-	2,
-	100,
-	0,
-	8
-);
-
-player.initialize();
-console.log(player.state);
-
-const enemy = new Character(
-	'img/goblin.png',
-	64,
-	64,
-	100,
-	100,
-	'right',
-	'walkright',
-	8,
-	[],
-	[
-		{
-			name: 'attackfront',
-			frames: 11,
-		},
-		{
-			name: 'walkright',
-			frames: 11,
-		},
-		{
-			name: 'attackback',
-			frames: 11,
-		},
-		{
-			name: 'walkleft',
-			frames: 11,
-		},
-		{
-			name: 'die',
-			frames: 1,
-		},
-	],
-	1,
-	100,
-	0,
-	8
-);
-
-enemy.initialize();
 
 image = new Image();
 image.src = 'img/map.png';
 
-function characterAnimate() {
+function animateGame() {
+	//Check if attacking and decrease hit points appropriately
 	if (player.beenAttacking == true) {
 		player.attackCounter++;
 		if (player.attackCounter > 40) {
@@ -189,24 +33,27 @@ function characterAnimate() {
 			}
 		}
 	}
-
+	//clear canvas
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+	//set map coordinates
 	let y = player.positionY;
 	if (player.positionY > 116) {
 		y = 116;
 	} else if (player.positionY < 0) {
 		y = 0;
 	}
-	//545x416
+
 	let x = player.positionX;
 	if (player.positionX > 242) {
 		x = 242;
 	} else if (player.positionX < 0) {
 		x = 0;
 	}
+	//545x416
+	console.log(player.positionX, player.positionY, x, y);
 
-	// console.log(player.positionX, player.positionY, x, y);
-
+	//render map
 	ctx.drawImage(
 		image,
 		x,
@@ -218,19 +65,23 @@ function characterAnimate() {
 		image.width * 2,
 		image.height * 2
 	);
-	let playerPosition =
+
+	//set animations
+	let playerSpritePosition =
 		Math.floor(player.gameFrame / player.staggerFrames) %
 		player.spriteAnimations[player.state].loc.length;
-	let playerFrameX = player.spriteWidth * playerPosition;
+	let playerFrameX = player.spriteWidth * playerSpritePosition;
 	let playerFrameY =
-		player.spriteAnimations[player.state].loc[playerPosition].y;
+		player.spriteAnimations[player.state].loc[playerSpritePosition].y;
 
-	let enemyPosition =
+	let enemySpritePosition =
 		Math.floor(enemy.gameFrame / enemy.staggerFrames) %
 		enemy.spriteAnimations[enemy.state].loc.length;
-	let enemyFrameX = enemy.spriteWidth * enemyPosition;
-	let enemyFrameY = enemy.spriteAnimations[enemy.state].loc[enemyPosition].y;
+	let enemyFrameX = enemy.spriteWidth * enemySpritePosition;
+	let enemyFrameY =
+		enemy.spriteAnimations[enemy.state].loc[enemySpritePosition].y;
 
+	//speed corrections for diagonal and when map moves
 	let temp_speed = player.speed;
 	if (
 		(player.walkingUp == true || player.walkingDown == true) &&
@@ -238,9 +89,14 @@ function characterAnimate() {
 	) {
 		temp_speed = player.speed / 1.41;
 	}
-	if (player.positionY < 116 || player.positionX < 242) {
+	if (player.positionY < 116 && (player.walkingDown || player.walkingUp)) {
 		temp_speed = temp_speed / 2;
 	}
+
+	if (player.positionX < 242 && (player.walkingLeft || player.walkingRight)) {
+		temp_speed = temp_speed / 2;
+	}
+	//player movements
 	if (player.walkingUp == true) {
 		player.positionY -= temp_speed;
 	}
@@ -254,25 +110,39 @@ function characterAnimate() {
 		player.positionX -= temp_speed;
 	}
 
+	//find distance between player and enemy
 	deltaX = player.positionX - enemy.positionX;
 	deltaY = player.positionY - enemy.positionY;
+	distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
+	//enemy dies when hit points below 0
 	if (enemy.hitPoints <= 0) {
-		enemy.state = 'die';
+		enemy.state = 'dead';
 	}
-	let enemy_temp_speed = enemy.speed;
 
-	if (enemy.state != 'die') {
-		if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) < 100) {
+	let enemy_temp_speed = enemy.speed;
+	//check if not already dead
+	if (enemy.state != 'dead') {
+		//will pursue player when distance less than 200 px
+		if (distance < 200) {
+			//correct enemy speed for map movement and diagonal
 			if (
 				(player.walkingUp == true || player.walkingDown == true) &&
 				(player.walkingRight == true || player.walkingLeft == true)
 			) {
 				enemy_temp_speed = enemy.speed / 1.41;
 			}
-			if (player.positionY < 116 || player.positionX < 242) {
+			if (player.positionY < 116 && (player.walkingDown || player.walkingUp)) {
 				enemy_temp_speed = enemy_temp_speed / 2;
 			}
+
+			if (
+				player.positionX < 242 &&
+				(player.walkingLeft || player.walkingRight)
+			) {
+				enemy_temp_speed = enemy_temp_speed / 2;
+			}
+			//enemy movements
 			if (deltaY > -2) {
 				enemy.positionY += enemy_temp_speed;
 			}
@@ -288,6 +158,7 @@ function characterAnimate() {
 		}
 	}
 
+	//render player and enemy
 	ctx.drawImage(
 		player.characterImage,
 		playerFrameX,
@@ -314,15 +185,13 @@ function characterAnimate() {
 
 	player.gameFrame++;
 	enemy.gameFrame++;
-	requestAnimationFrame(characterAnimate);
+	requestAnimationFrame(animateGame);
 }
 
-characterAnimate();
+//call animation
+animateGame();
 
-console.log(player.state);
-
-// console.log(player.state);
-
+//keydown inputs for player movement and attacks
 window.addEventListener(
 	'keydown',
 	function (event) {
@@ -402,6 +271,7 @@ window.addEventListener(
 	true
 );
 
+//keyup inputs to reset
 window.addEventListener('keyup', function (event) {
 	player.walkingUp = false;
 	player.walkingDown = false;
