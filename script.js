@@ -4,8 +4,6 @@ const ctx = canvas.getContext('2d');
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
-
-
 class Character {
 	constructor(
 		imgSRC,
@@ -20,6 +18,7 @@ class Character {
 		animationStates,
 		speed,
 		hitPoints,
+		experience,
 		gameFrame
 	) {
 		this.characterImage = new Image();
@@ -35,6 +34,7 @@ class Character {
 		this.animationStates = animationStates;
 		this.speed = speed;
 		this.hitPoints = hitPoints;
+		this.experience = experience;
 		this.walkingLeft = false;
 		this.walkingRight = false;
 		this.walkingUp = false;
@@ -108,8 +108,9 @@ const player = new Character(
 			frames: 7,
 		},
 	],
-	1,
+	2,
 	100,
+	0,
 	8
 );
 
@@ -149,12 +150,13 @@ const enemy = new Character(
 	],
 	1,
 	100,
+	0,
 	8
 );
 
 enemy.initialize();
 
-console.log(enemy)
+// console.log(player.positionY - enemy.positionY)
 
 function characterAnimate() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -162,39 +164,48 @@ function characterAnimate() {
 		Math.floor(player.gameFrame / player.staggerFrames) %
 		player.spriteAnimations[player.state].loc.length;
 	let playerFrameX = player.spriteWidth * playerPosition;
-	let playerFrameY = player.spriteAnimations[player.state].loc[playerPosition].y;
+	let playerFrameY =
+		player.spriteAnimations[player.state].loc[playerPosition].y;
 
 	let enemyPosition =
 		Math.floor(enemy.gameFrame / enemy.staggerFrames) %
 		enemy.spriteAnimations[enemy.state].loc.length;
 	let enemyFrameX = enemy.spriteWidth * enemyPosition;
-	let enemyFrameY =
-		enemy.spriteAnimations[enemy.state].loc[enemyPosition].y;
+	let enemyFrameY = enemy.spriteAnimations[enemy.state].loc[enemyPosition].y;
 
-
+	let temp_speed = player.speed;
+	if (
+		(player.walkingUp == true || player.walkingDown == true) &&
+		(player.walkingRight == true || player.walkingLeft == true)
+	) {
+		temp_speed = player.speed / 1.41;
+	}
 	if (player.walkingUp == true) {
-		player.positionY -= player.speed;
+		player.positionY -= temp_speed;
 	}
 	if (player.walkingDown == true) {
-		player.positionY += player.speed;
+		player.positionY += temp_speed;
 	}
 	if (player.walkingRight == true) {
-		player.positionX += player.speed;
+		player.positionX += temp_speed;
 	}
 	if (player.walkingLeft == true) {
-		player.positionX -= player.speed;
+		player.positionX -= temp_speed;
 	}
 
-	if (player.walkingUp == true) {
-		enemy.positionY -= enemy.speed;
-	}
-	if (player.walkingDown == true) {
+	deltaX = player.positionX - enemy.positionX
+	deltaY = player.positionY - enemy.positionY;
+
+	if (deltaY > 0) {
 		enemy.positionY += enemy.speed;
 	}
-	if (player.walkingRight == true) {
+	if (deltaY < 0) {
+		enemy.positionY -= enemy.speed;
+	}
+	if (deltaX > 10) {
 		enemy.positionX += enemy.speed;
 	}
-	if (player.walkingLeft == true) {
+	if (deltaX < 10) {
 		enemy.positionX -= enemy.speed;
 	}
 
