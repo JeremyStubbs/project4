@@ -87,15 +87,15 @@ function animateGame() {
 		(player.walkingUp == true || player.walkingDown == true) &&
 		(player.walkingRight == true || player.walkingLeft == true)
 	) {
-		temp_speed = player.speed / 1.41;
+		temp_speed = temp_speed / 1.41;
 	}
-	if (player.positionY < 116 && (player.walkingDown || player.walkingUp)) {
+	if (
+		(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
+		(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
+	) {
 		temp_speed = temp_speed / 2;
 	}
 
-	if (player.positionX < 242 && (player.walkingLeft || player.walkingRight)) {
-		temp_speed = temp_speed / 2;
-	}
 	//player can't go out of bounds
 	if (player.positionX < 0) {
 		player.positionX = 0;
@@ -143,15 +143,11 @@ function animateGame() {
 				(player.walkingUp == true || player.walkingDown == true) &&
 				(player.walkingRight == true || player.walkingLeft == true)
 			) {
-				enemy_temp_speed = enemy.speed / 1.41;
+				enemy_temp_speed = enemy_temp_speed / 1.41;
 			}
-			if (player.positionY < 116 && (player.walkingDown || player.walkingUp)) {
-				enemy_temp_speed = enemy_temp_speed / 2;
-			}
-
 			if (
-				player.positionX < 242 &&
-				(player.walkingLeft || player.walkingRight)
+				(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
+				(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
 			) {
 				enemy_temp_speed = enemy_temp_speed / 2;
 			}
