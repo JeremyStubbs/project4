@@ -1,9 +1,10 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-
+let WIDTH = 600;
+let HEIGHT = 600;
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
-
+const TILE_SIZE = 32;
 class Character {
 	constructor(
 		imgSRC,
@@ -40,6 +41,8 @@ class Character {
 		this.walkingUp = false;
 		this.walkingDown = false;
 		this.gameFrame = gameFrame;
+		this.beenAttacking = false;
+		this.attackCounter = 0;
 	}
 	initialize() {
 		this.animationStates.forEach((state, index) => {
@@ -53,11 +56,12 @@ class Character {
 			}
 			this.spriteAnimations[state.name] = frames;
 		});
+		console.log(player.state);
 	}
 }
 
 const player = new Character(
-	'dwarf.png',
+	'img/dwarf.png',
 	64,
 	64,
 	220,
@@ -115,9 +119,10 @@ const player = new Character(
 );
 
 player.initialize();
+console.log(player.state);
 
 const enemy = new Character(
-	'goblin.png',
+	'img/goblin.png',
 	64,
 	64,
 	100,
@@ -145,7 +150,7 @@ const enemy = new Character(
 		},
 		{
 			name: 'die',
-			frames: 5,
+			frames: 1,
 		},
 	],
 	1,
@@ -156,10 +161,49 @@ const enemy = new Character(
 
 enemy.initialize();
 
-// console.log(player.positionY - enemy.positionY)
+image = new Image();
+image.src = 'img/map.png';
 
 function characterAnimate() {
+	if (player.beenAttacking == true) {
+		player.attackCounter++;
+		if (player.attackCounter > 40) {
+			player.attackCounter = 0;
+			if (
+				player.state == 'attackright' &&
+				player.positionY - enemy.positionY < 5 &&
+				player.positionY - enemy.positionY > -5 &&
+				player.positionX - enemy.positionX > -40 &&
+				player.positionX - enemy.positionX < 0
+			) {
+				enemy.hitPoints -= 30;
+			}
+			if (
+				player.state == 'attackleft' &&
+				player.positionY - enemy.positionY < 5 &&
+				player.positionY - enemy.positionY > -5 &&
+				player.positionX - enemy.positionX < 30 &&
+				player.positionX - enemy.positionX > 0
+			) {
+				enemy.hitPoints -= 30;
+			}
+		}
+	}
+
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	let y = HEIGHT / 2 - player.positionY;
+	let x = WIDTH / 2 - player.positionX;
+	ctx.drawImage(
+		image,
+		player.positionX,
+		player.positionY,
+		image.width,
+		image.height,
+		0,
+		0,
+		image.width * 2,
+		image.height * 2
+	);
 	let playerPosition =
 		Math.floor(player.gameFrame / player.staggerFrames) %
 		player.spriteAnimations[player.state].loc.length;
@@ -193,20 +237,35 @@ function characterAnimate() {
 		player.positionX -= temp_speed;
 	}
 
-	deltaX = player.positionX - enemy.positionX
+	deltaX = player.positionX - enemy.positionX;
 	deltaY = player.positionY - enemy.positionY;
 
-	if (deltaY > 0) {
-		enemy.positionY += enemy.speed;
+	if (enemy.hitPoints <= 0) {
+		enemy.state = 'die';
 	}
-	if (deltaY < 0) {
-		enemy.positionY -= enemy.speed;
-	}
-	if (deltaX > 10) {
-		enemy.positionX += enemy.speed;
-	}
-	if (deltaX < 10) {
-		enemy.positionX -= enemy.speed;
+	let enemy_temp_speed = enemy.speed;
+
+	if (enemy.state != 'die') {
+		if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) < 100) {
+			if (
+				(player.walkingUp == true || player.walkingDown == true) &&
+				(player.walkingRight == true || player.walkingLeft == true)
+			) {
+				enemy_temp_speed = enemy.speed / 1.41;
+			}
+			if (deltaY > -2) {
+				enemy.positionY += enemy_temp_speed;
+			}
+			if (deltaY < -2) {
+				enemy.positionY -= enemy_temp_speed;
+			}
+			if (deltaX > 20) {
+				enemy.positionX += enemy_temp_speed;
+			}
+			if (deltaX < -30) {
+				enemy.positionX -= enemy_temp_speed;
+			}
+		}
 	}
 
 	ctx.drawImage(
@@ -239,6 +298,10 @@ function characterAnimate() {
 }
 
 characterAnimate();
+
+console.log(player.state);
+
+// console.log(player.state);
 
 window.addEventListener(
 	'keydown',
@@ -304,11 +367,14 @@ window.addEventListener(
 		}
 		if (event.key == 'Enter') {
 			if (player.vector == 'left') {
+				player.beenAttacking = true;
 				player.state = 'attackleft';
 			}
 			if (player.vector == 'right') {
+				player.beenAttacking = true;
 				player.state = 'attackright';
 			}
+			console.log(enemy.hitPoints);
 		}
 		// Cancel the default action to avoid it being handled twice
 		event.preventDefault();
@@ -321,6 +387,7 @@ window.addEventListener('keyup', function (event) {
 	player.walkingDown = false;
 	player.walkingRight = false;
 	player.walkingLeft = false;
+	player.attackCounter = 0;
 	if (player.vector == 'left') {
 		player.state = 'idleleft';
 	}
