@@ -194,18 +194,16 @@ function characterAnimate() {
 	let y = player.positionY;
 	if (player.positionY > 116) {
 		y = 116;
-	} 
-	else if(player.positionY <0){
-		y =  0;
+	} else if (player.positionY < 0) {
+		y = 0;
 	}
 	//545x416
-	let x= player.positionX;
+	let x = player.positionX;
 	if (player.positionX > 242) {
 		x = 242;
-	} 
-	else if (player.positionX <0) {
-		x = 0 ;
-	} 
+	} else if (player.positionX < 0) {
+		x = 0;
+	}
 
 	// console.log(player.positionX, player.positionY, x, y);
 
@@ -240,6 +238,9 @@ function characterAnimate() {
 	) {
 		temp_speed = player.speed / 1.41;
 	}
+	if (player.positionY < 116 || player.positionX < 242) {
+		temp_speed = temp_speed / 2;
+	}
 	if (player.walkingUp == true) {
 		player.positionY -= temp_speed;
 	}
@@ -268,6 +269,9 @@ function characterAnimate() {
 				(player.walkingRight == true || player.walkingLeft == true)
 			) {
 				enemy_temp_speed = enemy.speed / 1.41;
+			}
+			if (player.positionY < 116 || player.positionX < 242) {
+				enemy_temp_speed = enemy_temp_speed / 2;
 			}
 			if (deltaY > -2) {
 				enemy.positionY += enemy_temp_speed;
