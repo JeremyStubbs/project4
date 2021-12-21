@@ -191,12 +191,28 @@ function characterAnimate() {
 	}
 
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-	let y = HEIGHT / 2 - player.positionY;
-	let x = WIDTH / 2 - player.positionX;
+	let y = player.positionY;
+	if (player.positionY > 116) {
+		y = 116;
+	} 
+	else if(player.positionY <0){
+		y =  0;
+	}
+	//545x416
+	let x= player.positionX;
+	if (player.positionX > 242) {
+		x = 242;
+	} 
+	else if (player.positionX <0) {
+		x = 0 ;
+	} 
+
+	// console.log(player.positionX, player.positionY, x, y);
+
 	ctx.drawImage(
 		image,
-		player.positionX,
-		player.positionY,
+		x,
+		y,
 		image.width,
 		image.height,
 		0,
