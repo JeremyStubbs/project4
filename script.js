@@ -4,44 +4,54 @@ const ctx = canvas.getContext('2d');
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
-let playerGameFrame = 8;
+
 
 class Character {
 	constructor(
 		imgSRC,
-		playerSpriteWidth,
-		playerSpriteHeight,
-		playerX,
-		playerY,
-		playerVector,
-		playerState,
-		playerStaggerFrames,
-		playerSpriteAnimations,
-		playerAnimationStates
+		spriteWidth,
+		spriteHeight,
+		positionX,
+		positionY,
+		vector,
+		state,
+		staggerFrames,
+		spriteAnimations,
+		animationStates,
+		speed,
+		hitPoints,
+		gameFrame
 	) {
-		this.playerImage = new Image();
-		this.playerImage.src = imgSRC;
-		this.playerSpriteWidth = playerSpriteWidth;
-		this.playerSpriteHeight = playerSpriteHeight;
-		this.playerX = playerX;
-		this.playerY = playerY;
-		this.playerVector = playerVector;
-		this.playerState = playerState;
-		this.playerStaggerFrames = playerStaggerFrames;
-		this.playerSpriteAnimations = playerSpriteAnimations;
-		this.playerAnimationStates = playerAnimationStates;
+		this.characterImage = new Image();
+		this.characterImage.src = imgSRC;
+		this.spriteWidth = spriteWidth;
+		this.spriteHeight = spriteHeight;
+		this.positionX = positionX;
+		this.positionY = positionY;
+		this.vector = vector;
+		this.state = state;
+		this.staggerFrames = staggerFrames;
+		this.spriteAnimations = spriteAnimations;
+		this.animationStates = animationStates;
+		this.speed = speed;
+		this.hitPoints = hitPoints;
+		this.walkingLeft = false;
+		this.walkingRight = false;
+		this.walkingUp = false;
+		this.walkingDown = false;
+		this.gameFrame = gameFrame;
 	}
 	initialize() {
-		this.playerAnimationStates.forEach((state, index) => {
+		this.animationStates.forEach((state, index) => {
 			let frames = {
 				loc: [],
 			};
 			for (let j = 0; j < state.frames; j++) {
-				let positionX = j * this.playerSpriteWidth;
-				let positionY = index * this.playerSpriteHeight;
+				let positionX = j * this.spriteWidth;
+				let positionY = index * this.spriteHeight;
 				frames.loc.push({ x: positionX, y: positionY });
 			}
-			this.playerSpriteAnimations[state.name] = frames;
+			this.spriteAnimations[state.name] = frames;
 		});
 	}
 }
@@ -97,33 +107,123 @@ const player = new Character(
 			name: 'dieleft',
 			frames: 7,
 		},
-	]
+	],
+	1,
+	100,
+	8
 );
 
 player.initialize();
 
+const enemy = new Character(
+	'goblin.png',
+	64,
+	64,
+	100,
+	100,
+	'right',
+	'walkright',
+	8,
+	[],
+	[
+		{
+			name: 'attackfront',
+			frames: 11,
+		},
+		{
+			name: 'walkright',
+			frames: 11,
+		},
+		{
+			name: 'attackback',
+			frames: 11,
+		},
+		{
+			name: 'walkleft',
+			frames: 11,
+		},
+		{
+			name: 'die',
+			frames: 5,
+		},
+	],
+	1,
+	100,
+	8
+);
+
+enemy.initialize();
+
+console.log(enemy)
+
 function characterAnimate() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-	let position =
-		Math.floor(playerGameFrame / player.playerStaggerFrames) %
-		player.playerSpriteAnimations[player.playerState].loc.length;
-	let playerFrameX = player.playerSpriteWidth * position;
-	let playerFrameY =
-		player.playerSpriteAnimations[player.playerState].loc[position].y;
+	let playerPosition =
+		Math.floor(player.gameFrame / player.staggerFrames) %
+		player.spriteAnimations[player.state].loc.length;
+	let playerFrameX = player.spriteWidth * playerPosition;
+	let playerFrameY = player.spriteAnimations[player.state].loc[playerPosition].y;
+
+	let enemyPosition =
+		Math.floor(enemy.gameFrame / enemy.staggerFrames) %
+		enemy.spriteAnimations[enemy.state].loc.length;
+	let enemyFrameX = enemy.spriteWidth * enemyPosition;
+	let enemyFrameY =
+		enemy.spriteAnimations[enemy.state].loc[enemyPosition].y;
+
+
+	if (player.walkingUp == true) {
+		player.positionY -= player.speed;
+	}
+	if (player.walkingDown == true) {
+		player.positionY += player.speed;
+	}
+	if (player.walkingRight == true) {
+		player.positionX += player.speed;
+	}
+	if (player.walkingLeft == true) {
+		player.positionX -= player.speed;
+	}
+
+	if (player.walkingUp == true) {
+		enemy.positionY -= enemy.speed;
+	}
+	if (player.walkingDown == true) {
+		enemy.positionY += enemy.speed;
+	}
+	if (player.walkingRight == true) {
+		enemy.positionX += enemy.speed;
+	}
+	if (player.walkingLeft == true) {
+		enemy.positionX -= enemy.speed;
+	}
 
 	ctx.drawImage(
-		player.playerImage,
+		player.characterImage,
 		playerFrameX,
 		playerFrameY,
-		player.playerSpriteWidth,
-		player.playerSpriteHeight,
-		player.playerX,
-		player.playerY,
-		player.playerSpriteWidth,
-		player.playerSpriteHeight
+		player.spriteWidth,
+		player.spriteHeight,
+		player.positionX,
+		player.positionY,
+		player.spriteWidth,
+		player.spriteHeight
 	);
 
-	playerGameFrame++;
+	ctx.drawImage(
+		enemy.characterImage,
+		enemyFrameX,
+		enemyFrameY,
+		enemy.spriteWidth,
+		enemy.spriteHeight,
+		enemy.positionX,
+		enemy.positionY,
+		enemy.spriteWidth,
+		enemy.spriteHeight
+	);
+
+	player.gameFrame++;
+	enemy.gameFrame++;
 	requestAnimationFrame(characterAnimate);
 }
 
@@ -136,67 +236,67 @@ window.addEventListener(
 			return; // Do nothing if the event was already processed
 		}
 		if (event.key == 'w') {
-			player.playerY -= 10;
-			if (player.playerVector == 'left') {
-				player.playerState = 'walkleft';
+			player.walkingUp = true;
+			if (player.vector == 'left') {
+				player.state = 'walkleft';
 			}
-			if (player.playerVector == 'right') {
-				player.playerState = 'walkright';
+			if (player.vector == 'right') {
+				player.state = 'walkright';
 			}
 		}
 		if (event.key == 's') {
-			player.playerY += 10;
-			if (player.playerVector == 'left') {
-				player.playerState = 'walkleft';
+			player.walkingDown = true;
+			if (player.vector == 'left') {
+				player.state = 'walkleft';
 			}
-			if (player.playerVector == 'right') {
-				player.playerState = 'walkright';
+			if (player.vector == 'right') {
+				player.state = 'walkright';
 			}
 		}
 		if (event.key == 'a') {
-			player.playerX -= 10;
-			player.playerState = 'walkleft';
-			player.playerVector = 'left';
+			player.walkingLeft = true;
+			player.state = 'walkleft';
+			player.vector = 'left';
 		}
 		if (event.key == 'd') {
-			player.playerX += 10;
-			player.playerState = 'walkright';
-			player.playerVector = 'right';
+			player.walkingRight = true;
+			player.state = 'walkright';
+			player.vector = 'right';
 		}
 		if (event.key == 'W') {
-			player.playerY -= 10;
-			if (player.playerVector == 'left') {
-				player.playerState = 'walkleft';
+			player.walkingUp = true;
+			if (player.vector == 'left') {
+				player.state = 'walkleft';
 			}
-			if (player.playerVector == 'right') {
-				player.playerState = 'walkright';
+			if (player.vector == 'right') {
+				player.state = 'walkright';
 			}
 		}
 		if (event.key == 'S') {
-			player.playerY += 10;
-			if (player.playerVector == 'left') {
-				player.playerState = 'walkleft';
+			player.walkingDown = true;
+			if (player.vector == 'left') {
+				player.state = 'walkleft';
 			}
-			if (player.playerVector == 'right') {
-				player.playerState = 'walkright';
+			if (player.vector == 'right') {
+				player.state = 'walkright';
 			}
 		}
 		if (event.key == 'A') {
-			player.playerX -= 10;
-			player.playerState = 'walkleft';
-			player.playerVector = 'left';
+			player.walkingLeft = true;
+			player.state = 'walkleft';
+			player.vector = 'left';
 		}
 		if (event.key == 'D') {
-			player.playerX += 10;
-			player.playerState = 'walkright';
-			player.playerVector = 'left';
+			player.walkingRight = true;
+			player.state = 'walkright';
+			player.vector = 'left';
 		}
 		if (event.key == 'Enter') {
-			if (player.playerVector == 'left') {
-				player.playerState = 'attackleft';
+			if (player.vector == 'left') {
+				player.state = 'attackleft';
 			}
-			if (player.playerVector == 'right') {
-				player.playerState = 'attackright';
+			if (player.vector == 'right') {
+				player.state = 'attackright';
 			}
 		}
 		// Cancel the default action to avoid it being handled twice
@@ -206,10 +306,14 @@ window.addEventListener(
 );
 
 window.addEventListener('keyup', function (event) {
-	if (player.playerVector == 'left') {
-		player.playerState = 'idleleft';
+	player.walkingUp = false;
+	player.walkingDown = false;
+	player.walkingRight = false;
+	player.walkingLeft = false;
+	if (player.vector == 'left') {
+		player.state = 'idleleft';
 	}
-	if (player.playerVector == 'right') {
-		player.playerState = 'idleright';
+	if (player.vector == 'right') {
+		player.state = 'idleright';
 	}
 });
