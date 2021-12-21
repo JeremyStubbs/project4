@@ -96,6 +96,19 @@ function animateGame() {
 	if (player.positionX < 242 && (player.walkingLeft || player.walkingRight)) {
 		temp_speed = temp_speed / 2;
 	}
+	//player can't go out of bounds
+	if (player.positionX < 0) {
+		player.positionX = 0;
+	}
+	if (player.positionX > 550) {
+		player.positionX = 550;
+	}
+	if (player.positionY < 0) {
+		player.positionY = 0;
+	}
+	if (player.positionY > 540) {
+		player.positionY = 540;
+	}
 	//player movements
 	if (player.walkingUp == true) {
 		player.positionY -= temp_speed;
