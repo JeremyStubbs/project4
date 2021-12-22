@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
+//make a map class
 class Map {
 	constructor(imgSRC, positionX, positionY) {
 		this.image = new Image();
@@ -14,14 +15,19 @@ class Map {
 	}
 }
 
+//make a map
 map = new Map('img/map.png', 242, 116);
+
+//set variables used for death animations
 let player_dead_counter = 0;
 let enemy_dead_counter = 0;
+
+//Animation function
 function animateGame() {
 	//clear canvas
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	//set animations
+	//set sprite images
 	let playerSpritePosition =
 		Math.floor(player.gameFrame / player.staggerFrames) %
 		player.spriteAnimations[player.state].loc.length;
@@ -79,7 +85,7 @@ function animateGame() {
 		}
 	}
 
-	//enemy or player dies when hit points below 0
+	//enemy or player dies when hit points below 0. After number of frames in animation, stop animation. After another set of frames, character disappears because I haven't figured out how to make corpse stay where it lay.
 	if (enemy.hitPoints <= 0 && enemy_dead_counter < 5) {
 		enemy_dead_counter++;
 		enemy.state = 'dead';
@@ -166,6 +172,7 @@ function animateGame() {
 	if (enemy.state != 'dead') {
 		//will pursue player when distance less than 200 px
 		if (distance < 200) {
+			//reverse speed if map is moving. works because player speed is twice as large as enemy speed. any other difference would require some math.
 			if (map.mapMoving) {
 				enemy_temp_speed = -enemy_temp_speed;
 			}
@@ -207,7 +214,7 @@ function animateGame() {
 	}
 	console.log(
 		// player.positionX,
-		// player.positionY,
+		// player.positionY
 		// enemy.positionX,
 		// enemy.positionY,
 		// distance,
@@ -217,13 +224,19 @@ function animateGame() {
 		// map.mapMoving
 		// temp_speed,
 		// enemy_temp_speed,
-		// player
+		player.hitPoints
 		// player_dead_counter,
-		enemy
+		// enemy
 	);
 
-	//render map
+	let health = document.getElementById('health');
+	health.innerText = `Health: ${player.hitPoints}`;
 
+	let experience = document.getElementById('experience');
+	experience.innerText = `Experience: ${player.experience}`;
+
+	//0, 86-108
+	//render map
 	ctx.drawImage(
 		map.image,
 		map.positionX,
@@ -272,8 +285,10 @@ function animateGame() {
 	requestAnimationFrame(animateGame);
 }
 
-//call animations
-animateGame();
+//call animation function
+
+
+	// document.body.innerHTML += '<div id="experience">adsf</div>';
 
 //keydown inputs for player movement and attacks
 window.addEventListener(
