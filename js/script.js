@@ -14,8 +14,32 @@ class Map {
 }
 
 map = new Map('img/map.png', 242, 116);
-
+let player_dead_counter = 0;
+let enemy_dead_counter;
 function animateGame() {
+	//clear canvas
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+	//set animations
+	let playerSpritePosition =
+		Math.floor(player.gameFrame / player.staggerFrames) %
+		player.spriteAnimations[player.state].loc.length;
+	let playerFrameX = player.spriteWidth * playerSpritePosition;
+	let playerFrameY =
+		player.spriteAnimations[player.state].loc[playerSpritePosition].y;
+
+	let enemySpritePosition =
+		Math.floor(enemy.gameFrame / enemy.staggerFrames) %
+		enemy.spriteAnimations[enemy.state].loc.length;
+	let enemyFrameX = enemy.spriteWidth * enemySpritePosition;
+	let enemyFrameY =
+		enemy.spriteAnimations[enemy.state].loc[enemySpritePosition].y;
+
+	//find distance between player and enemy
+	deltaX = player.positionX - enemy.positionX;
+	deltaY = player.positionY - enemy.positionY;
+	distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
 	//Check if attacking and decrease hit points appropriately
 	if (player.beenAttacking == true) {
 		player.attackCounter++;
@@ -37,31 +61,36 @@ function animateGame() {
 				player.positionX - enemy.positionX < 30 &&
 				player.positionX - enemy.positionX > 0
 			) {
-				enemy.hitPoints -= 30;
+				enemy.hitPoints -= player.attackDamage;
 			}
 		}
 	}
-	//clear canvas
-	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	//set animations
-	let playerSpritePosition =
-		Math.floor(player.gameFrame / player.staggerFrames) %
-		player.spriteAnimations[player.state].loc.length;
-	let playerFrameX = player.spriteWidth * playerSpritePosition;
-	let playerFrameY =
-		player.spriteAnimations[player.state].loc[playerSpritePosition].y;
+	if (enemy.attackCounter <= 100) {
+		enemy.attackCounter++;
+	}
 
-	let enemySpritePosition =
-		Math.floor(enemy.gameFrame / enemy.staggerFrames) %
-		enemy.spriteAnimations[enemy.state].loc.length;
-	let enemyFrameX = enemy.spriteWidth * enemySpritePosition;
-	let enemyFrameY =
-		enemy.spriteAnimations[enemy.state].loc[enemySpritePosition].y;
+	if (enemy.attackCounter > 100) {
+		enemy.attackCounter = 0;
+		if (distance < 70) {
+			player.hitPoints -= enemy.attackDamage;
+		}
+	}
+	//enemy or player dies when hit points below 0
 
-	//enemy dies when hit points below 0
 	if (enemy.hitPoints <= 0) {
 		enemy.state = 'dead';
+	}
+
+	if (player.hitPoints <= 0 && player_dead_counter < 7) {
+		player.state = 'deadright';
+		player_dead_counter++;
+	}
+
+	if (player.hitPoints <= 0 && player_dead_counter >= 7) {
+		playerFrameX = 384;
+		playerFrameX = 256;
+		return;
 	}
 
 	//speed corrections for diagonal and when map moves
@@ -87,27 +116,49 @@ function animateGame() {
 		player.positionY = 540;
 	}
 	//player movements
+
 	if (player.walkingUp == true && player.positionY > 89) {
+		player.positionY -= temp_speed;
+	}
+	if (player.walkingUp == true && player.positionY < 90 && map.positionY <= 0) {
 		player.positionY -= temp_speed;
 	}
 	if (player.walkingDown == true && player.positionY < 451) {
 		player.positionY += temp_speed;
 	}
+	if (
+		player.walkingDown == true &&
+		player.positionY > 450 &&
+		map.positionY >= 116
+	) {
+		player.positionY += temp_speed;
+	}
 	if (player.walkingRight == true && player.positionX < 461) {
+		player.positionX += temp_speed;
+	}
+	if (
+		player.walkingRight == true &&
+		player.positionX > 460 &&
+		map.positionX >= 242
+	) {
 		player.positionX += temp_speed;
 	}
 	if (player.walkingLeft == true && player.positionX > 89) {
 		player.positionX -= temp_speed;
 	}
+	if (
+		player.walkingLeft == true &&
+		player.positionX < 90 &&
+		map.positionX <= 0
+	) {
+		player.positionX -= temp_speed;
+	}
 
-	//find distance between player and enemy
-	deltaX = player.positionX - enemy.positionX;
-	deltaY = player.positionY - enemy.positionY;
-	distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
+	//enemy movements
 	//set enemy speed
 	let enemy_temp_speed = temp_speed * enemy.speed;
-	//check if not already dead
+
+	//check if not already dead then
 	if (enemy.state != 'dead') {
 		//will pursue player when distance less than 200 px
 		if (distance < 200) {
@@ -127,20 +178,32 @@ function animateGame() {
 	}
 
 	//map movement
-	if (player.positionX < 90 && player.walkingLeft && map.positionX > -50) {
+	if (player.positionX < 90 && player.walkingLeft && map.positionX > 0) {
 		map.positionX -= temp_speed;
 	}
-	if (player.positionX > 460 && player.walkingRight && map.positionX < 292) {
+	if (player.positionX > 460 && player.walkingRight && map.positionX < 242) {
 		map.positionX += temp_speed;
 	}
-	if (player.positionY < 90 && player.walkingUp && map.positionY > -54) {
+	if (player.positionY < 90 && player.walkingUp && map.positionY > 0) {
 		map.positionY -= temp_speed;
 	}
 
-	if (player.positionY > 450 && player.walkingDown && map.positionY < 156) {
+	if (player.positionY > 450 && player.walkingDown && map.positionY < 116) {
 		map.positionY += temp_speed;
 	}
-	// console.log(player.positionX, player.positionY, map.positionX, map.positionY);
+	console.log(
+		player.positionX,
+		player.positionY,
+		enemy.positionX,
+		enemy.positionY,
+		player.hitPoints
+		// map.positionX,
+		// map.positionY
+		// temp_speed,
+		// enemy_temp_speed,
+		// player
+		// player_dead_counter
+	);
 
 	//render map
 	ctx.drawImage(

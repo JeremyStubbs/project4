@@ -12,6 +12,7 @@ class Character {
 		animationStates,
 		speed,
 		hitPoints,
+        attackDamage,
 		experience,
 		gameFrame
 	) {
@@ -28,6 +29,7 @@ class Character {
 		this.animationStates = animationStates;
 		this.speed = speed;
 		this.hitPoints = hitPoints;
+        this.attackDamage = attackDamage;
 		this.experience = experience;
 		this.walkingLeft = false;
 		this.walkingRight = false;
@@ -57,8 +59,8 @@ const player = new Character(
 	'img/dwarf.png',
 	64,
 	64,
-	211,
-	454,
+	155,
+	458,
 	'right',
 	'idleleft',
 	8,
@@ -81,7 +83,7 @@ const player = new Character(
 			frames: 1,
 		},
 		{
-			name: 'dieright',
+			name: 'deadright',
 			frames: 7,
 		},
 		{
@@ -101,12 +103,13 @@ const player = new Character(
 			frames: 1,
 		},
 		{
-			name: 'dieleft',
+			name: 'deadleft',
 			frames: 7,
 		},
 	],
 	2,
 	100,
+    30,
 	0,
 	8
 );
@@ -147,6 +150,7 @@ const enemy = new Character(
 	],
 	0.5,
 	100,
+    20,
 	0,
 	8
 );
