@@ -18,12 +18,39 @@ class Map {
 //make a map
 map = new Map('img/map.png', 242, 116);
 
+// let startedLevel = false;
 let endOfLevel = false;
+
+let startScreen = new Image();
+let endScreen = new Image();
+
+endScreen.src = 'img/gameover.png';
+startScreen.src = 'img/start.png';
+
+function startLoad() {
+	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+}
+// function endLoad() {
+// 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+// 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
+// }
+
+// if (startedLevel === false) {
+requestAnimationFrame(startLoad);
+// }
 
 //Animation function
 function animateGame() {
-	if (player.positionX <=0 && player.positionY >=86 && player.positionY <= 108){endOfLevel =true}
+	if (
+		player.positionX <= 0 &&
+		player.positionY >= 86 &&
+		player.positionY <= 108
+	) {
+		endOfLevel = true;
+	}
 	if (endOfLevel) {
+		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
 		return;
 	}
 
@@ -112,7 +139,7 @@ function animateGame() {
 	}
 
 	if (player.dead_counter > 100) {
-		return;
+		endOfLevel = true;
 	}
 
 	//speed corrections for diagonal and when map moves
@@ -269,6 +296,10 @@ function animateGame() {
 
 	//recursively call animations
 	requestAnimationFrame(animateGame);
+}
+
+if (endOfLevel === true) {
+	requestAnimationFrame(endLoad);
 }
 
 //keydown inputs for player movement and attacks
