@@ -12,9 +12,12 @@ class Character {
 		animationStates,
 		speed,
 		hitPoints,
-        attackDamage,
+		attackDamage,
+		attackSpeed,
+		attackDistance,
 		experience,
-		gameFrame
+		gameFrame,
+
 	) {
 		this.characterImage = new Image();
 		this.characterImage.src = imgSRC;
@@ -29,7 +32,7 @@ class Character {
 		this.animationStates = animationStates;
 		this.speed = speed;
 		this.hitPoints = hitPoints;
-        this.attackDamage = attackDamage;
+		this.attackDamage = attackDamage;
 		this.experience = experience;
 		this.walkingLeft = false;
 		this.walkingRight = false;
@@ -38,6 +41,9 @@ class Character {
 		this.gameFrame = gameFrame;
 		this.beenAttacking = false;
 		this.attackCounter = 0;
+		this.attackSpeed = attackSpeed;
+		this.attackDistance = attackDistance;
+        this.render = true;
 	}
 	initialize() {
 		this.animationStates.forEach((state, index) => {
@@ -109,7 +115,9 @@ const player = new Character(
 	],
 	2,
 	100,
-    30,
+	30,
+	40,
+	40,
 	0,
 	8
 );
@@ -121,7 +129,7 @@ const enemy = new Character(
 	64,
 	64,
 	-50,
-	-50,
+	0,
 	'right',
 	'walkright',
 	8,
@@ -145,13 +153,15 @@ const enemy = new Character(
 		},
 		{
 			name: 'dead',
-			frames: 1,
+			frames: 5,
 		},
 	],
 	0.5,
 	100,
-    20,
-	0,
+	20,
+	50,
+	50,
+	20,
 	8
 );
 

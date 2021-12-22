@@ -10,12 +10,13 @@ class Map {
 		this.image.src = imgSRC;
 		this.positionX = positionX;
 		this.positionY = positionY;
+		this.mapMoving = false;
 	}
 }
 
 map = new Map('img/map.png', 242, 116);
 let player_dead_counter = 0;
-let enemy_dead_counter;
+let enemy_dead_counter = 0;
 function animateGame() {
 	//clear canvas
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -41,45 +42,56 @@ function animateGame() {
 	distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
 	//Check if attacking and decrease hit points appropriately
-	if (player.beenAttacking == true) {
+	if (player.beenAttacking) {
 		player.attackCounter++;
-		if (player.attackCounter > 40) {
+		if (player.attackCounter > player.attackSpeed) {
 			player.attackCounter = 0;
 			if (
 				player.state == 'attackright' &&
 				player.positionY - enemy.positionY < 5 &&
 				player.positionY - enemy.positionY > -5 &&
-				player.positionX - enemy.positionX > -40 &&
+				player.positionX - enemy.positionX > -player.attackDistance &&
 				player.positionX - enemy.positionX < 0
 			) {
-				enemy.hitPoints -= 30;
+				enemy.hitPoints -= player.attackDamage;
 			}
 			if (
 				player.state == 'attackleft' &&
 				player.positionY - enemy.positionY < 5 &&
 				player.positionY - enemy.positionY > -5 &&
-				player.positionX - enemy.positionX < 30 &&
+				player.positionX - enemy.positionX < player.attackDistance &&
 				player.positionX - enemy.positionX > 0
 			) {
 				enemy.hitPoints -= player.attackDamage;
 			}
 		}
 	}
+	if (enemy.state != 'dead') {
+		if (enemy.attackCounter <= enemy.attackSpeed) {
+			enemy.attackCounter++;
+		}
 
-	if (enemy.attackCounter <= 100) {
-		enemy.attackCounter++;
-	}
-
-	if (enemy.attackCounter > 100) {
-		enemy.attackCounter = 0;
-		if (distance < 70) {
-			player.hitPoints -= enemy.attackDamage;
+		if (enemy.attackCounter > enemy.attackSpeed) {
+			enemy.attackCounter = 0;
+			if (distance < enemy.attackDistance) {
+				player.hitPoints -= enemy.attackDamage;
+			}
 		}
 	}
-	//enemy or player dies when hit points below 0
 
-	if (enemy.hitPoints <= 0) {
+	//enemy or player dies when hit points below 0
+	if (enemy.hitPoints <= 0 && enemy_dead_counter < 5) {
+		enemy_dead_counter++;
 		enemy.state = 'dead';
+		player.experience += enemy.experience;
+	}
+	if (enemy.hitPoints <= 0 && enemy_dead_counter >= 5) {
+		enemyFrameX = 256;
+		enemyFrameX = 256;
+		enemy_dead_counter++;
+	}
+	if (enemy.hitPoints <= 0 && enemy_dead_counter > 20) {
+		enemy.render = false;
 	}
 
 	if (player.hitPoints <= 0 && player_dead_counter < 7) {
@@ -89,15 +101,19 @@ function animateGame() {
 
 	if (player.hitPoints <= 0 && player_dead_counter >= 7) {
 		playerFrameX = 384;
-		playerFrameX = 256;
-		return;
+		playerFrameY = 256;
+		player_dead_counter++;
+	}
+
+	if (player_dead_counter > 100) {
+		player.render = false;
 	}
 
 	//speed corrections for diagonal and when map moves
 	let temp_speed = player.speed;
 	if (
-		(player.walkingUp == true || player.walkingDown == true) &&
-		(player.walkingRight == true || player.walkingLeft == true)
+		(player.walkingUp || player.walkingDown) &&
+		(player.walkingRight || player.walkingLeft)
 	) {
 		temp_speed = temp_speed / 1.41;
 	}
@@ -115,42 +131,30 @@ function animateGame() {
 	if (player.positionY > 540) {
 		player.positionY = 540;
 	}
-	//player movements
 
-	if (player.walkingUp == true && player.positionY > 89) {
+	//player movements
+	if (player.walkingUp && player.positionY > 90) {
 		player.positionY -= temp_speed;
 	}
-	if (player.walkingUp == true && player.positionY < 90 && map.positionY <= 0) {
+	if (player.walkingUp && player.positionY <= 90 && map.positionY <= 0) {
 		player.positionY -= temp_speed;
 	}
-	if (player.walkingDown == true && player.positionY < 451) {
+	if (player.walkingDown && player.positionY < 450) {
 		player.positionY += temp_speed;
 	}
-	if (
-		player.walkingDown == true &&
-		player.positionY > 450 &&
-		map.positionY >= 116
-	) {
+	if (player.walkingDown && player.positionY >= 450 && map.positionY >= 116) {
 		player.positionY += temp_speed;
 	}
-	if (player.walkingRight == true && player.positionX < 461) {
+	if (player.walkingRight && player.positionX < 460) {
 		player.positionX += temp_speed;
 	}
-	if (
-		player.walkingRight == true &&
-		player.positionX > 460 &&
-		map.positionX >= 242
-	) {
+	if (player.walkingRight && player.positionX >= 460 && map.positionX >= 242) {
 		player.positionX += temp_speed;
 	}
-	if (player.walkingLeft == true && player.positionX > 89) {
+	if (player.walkingLeft && player.positionX > 90) {
 		player.positionX -= temp_speed;
 	}
-	if (
-		player.walkingLeft == true &&
-		player.positionX < 90 &&
-		map.positionX <= 0
-	) {
+	if (player.walkingLeft && player.positionX <= 90 && map.positionX <= 0) {
 		player.positionX -= temp_speed;
 	}
 
@@ -162,50 +166,64 @@ function animateGame() {
 	if (enemy.state != 'dead') {
 		//will pursue player when distance less than 200 px
 		if (distance < 200) {
-			if (deltaY > -2) {
+			if (map.mapMoving) {
+				enemy_temp_speed = -enemy_temp_speed;
+			}
+
+			if (deltaY > 2) {
 				enemy.positionY += enemy_temp_speed;
 			}
 			if (deltaY < -2) {
 				enemy.positionY -= enemy_temp_speed;
 			}
+
 			if (deltaX > 20) {
 				enemy.positionX += enemy_temp_speed;
 			}
-			if (deltaX < -30) {
+			if (deltaX < -20) {
 				enemy.positionX -= enemy_temp_speed;
 			}
 		}
 	}
 
 	//map movement
-	if (player.positionX < 90 && player.walkingLeft && map.positionX > 0) {
+	map.mapMoving = false;
+	if (player.positionX <= 90 && player.walkingLeft && map.positionX > 0) {
+		map.mapMoving = true;
 		map.positionX -= temp_speed;
 	}
-	if (player.positionX > 460 && player.walkingRight && map.positionX < 242) {
+	if (player.positionX >= 460 && player.walkingRight && map.positionX < 242) {
+		map.mapMoving = true;
 		map.positionX += temp_speed;
 	}
-	if (player.positionY < 90 && player.walkingUp && map.positionY > 0) {
+	if (player.positionY <= 90 && player.walkingUp && map.positionY > 0) {
+		map.mapMoving = true;
 		map.positionY -= temp_speed;
 	}
 
-	if (player.positionY > 450 && player.walkingDown && map.positionY < 116) {
+	if (player.positionY >= 450 && player.walkingDown && map.positionY < 116) {
+		map.mapMoving = true;
 		map.positionY += temp_speed;
 	}
 	console.log(
-		player.positionX,
-		player.positionY,
-		enemy.positionX,
-		enemy.positionY,
-		player.hitPoints
+		// player.positionX,
+		// player.positionY,
+		// enemy.positionX,
+		// enemy.positionY,
+		// distance,
+		// player.hitPoints
 		// map.positionX,
-		// map.positionY
+		// map.positionY,
+		// map.mapMoving
 		// temp_speed,
 		// enemy_temp_speed,
 		// player
-		// player_dead_counter
+		// player_dead_counter,
+		enemy
 	);
 
 	//render map
+
 	ctx.drawImage(
 		map.image,
 		map.positionX,
@@ -219,30 +237,33 @@ function animateGame() {
 	);
 
 	//render player and enemy
-	ctx.drawImage(
-		player.characterImage,
-		playerFrameX,
-		playerFrameY,
-		player.spriteWidth,
-		player.spriteHeight,
-		player.positionX,
-		player.positionY,
-		player.spriteWidth,
-		player.spriteHeight
-	);
+	if (player.render) {
+		ctx.drawImage(
+			player.characterImage,
+			playerFrameX,
+			playerFrameY,
+			player.spriteWidth,
+			player.spriteHeight,
+			player.positionX,
+			player.positionY,
+			player.spriteWidth,
+			player.spriteHeight
+		);
+	}
 
-	ctx.drawImage(
-		enemy.characterImage,
-		enemyFrameX,
-		enemyFrameY,
-		enemy.spriteWidth,
-		enemy.spriteHeight,
-		enemy.positionX,
-		enemy.positionY,
-		enemy.spriteWidth,
-		enemy.spriteHeight
-	);
-
+	if (enemy.render) {
+		ctx.drawImage(
+			enemy.characterImage,
+			enemyFrameX,
+			enemyFrameY,
+			enemy.spriteWidth,
+			enemy.spriteHeight,
+			enemy.positionX,
+			enemy.positionY,
+			enemy.spriteWidth,
+			enemy.spriteHeight
+		);
+	}
 	//increase gameFrames (used for sprite animations)
 	player.gameFrame++;
 	enemy.gameFrame++;
@@ -348,43 +369,3 @@ window.addEventListener('keyup', function (event) {
 		player.state = 'idleright';
 	}
 });
-
-//set map coordinates
-// map.positionX = player.positionX;
-// if (player.positionX > 242) {
-// 	map.positionX = 242;
-// } else if (player.positionX < 0) {
-// 	map.positionX = 0;
-// }
-
-// map.positionY = player.positionY;
-// if (player.positionY > 116) {
-// 	map.positionY = 116;
-// } else if (player.positionY < 0) {
-// 	map.positionY = 0;
-// }
-
-//545x416
-//550x540
-//90,460, 90,450
-// console.log(player.positionX, player.positionY, map.positionX, map.positionY);
-
-//render map
-// ctx.drawImage(
-// 	map.image,
-// 	map.positionX,
-// 	map.positionY,
-// 	map.image.width,
-// 	map.image.height,
-// 	0,
-// 	0,
-// 	map.image.width * 2,
-// 	map.image.height * 2
-// );
-
-// if (
-// 	(player.positionY < 116 && (player.walkingDown || player.walkingUp)) ||
-// 	(player.positionX < 242 && (player.walkingLeft || player.walkingRight))
-// ) {
-// 	temp_speed = temp_speed / 2;
-// }
