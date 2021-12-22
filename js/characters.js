@@ -15,9 +15,7 @@ class Character {
 		attackDamage,
 		attackSpeed,
 		attackDistance,
-		experience,
-		gameFrame,
-
+		experience
 	) {
 		this.characterImage = new Image();
 		this.characterImage.src = imgSRC;
@@ -38,12 +36,13 @@ class Character {
 		this.walkingRight = false;
 		this.walkingUp = false;
 		this.walkingDown = false;
-		this.gameFrame = gameFrame;
+		this.gameFrame = 0;
 		this.beenAttacking = false;
 		this.attackCounter = 0;
 		this.attackSpeed = attackSpeed;
 		this.attackDistance = attackDistance;
-        this.render = true;
+		this.render = true;
+        this.dead_counter =0;
 	}
 	initialize() {
 		this.animationStates.forEach((state, index) => {
@@ -118,8 +117,7 @@ const player = new Character(
 	30,
 	40,
 	40,
-	0,
-	8
+	0
 );
 
 player.initialize();
@@ -161,8 +159,7 @@ const enemy = new Character(
 	20,
 	50,
 	50,
-	20,
-	8
+	20
 );
 
 enemy.initialize();

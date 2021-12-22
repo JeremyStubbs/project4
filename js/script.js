@@ -18,14 +18,14 @@ class Map {
 //make a map
 map = new Map('img/map.png', 242, 116);
 
-//set variables used for death animations
-let player_dead_counter = 0;
-let enemy_dead_counter = 0;
+let endOfLevel = false;
 
 //Animation function
 function animateGame() {
-	//clear canvas
-	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	if (player.positionX <=0 && player.positionY >=86 && player.positionY <= 108){endOfLevel =true}
+	if (endOfLevel) {
+		return;
+	}
 
 	//set sprite images
 	let playerSpritePosition =
@@ -86,33 +86,33 @@ function animateGame() {
 	}
 
 	//enemy or player dies when hit points below 0. After number of frames in animation, stop animation. After another set of frames, character disappears because I haven't figured out how to make corpse stay where it lay.
-	if (enemy.hitPoints <= 0 && enemy_dead_counter < 5) {
-		enemy_dead_counter++;
+	if (enemy.hitPoints <= 0 && enemy.dead_counter < 5) {
+		enemy.dead_counter++;
 		enemy.state = 'dead';
 		player.experience += enemy.experience;
 	}
-	if (enemy.hitPoints <= 0 && enemy_dead_counter >= 5) {
+	if (enemy.hitPoints <= 0 && enemy.dead_counter >= 5) {
 		enemyFrameX = 256;
 		enemyFrameX = 256;
-		enemy_dead_counter++;
+		enemy.dead_counter++;
 	}
-	if (enemy.hitPoints <= 0 && enemy_dead_counter > 20) {
+	if (enemy.hitPoints <= 0 && enemy.dead_counter > 20) {
 		enemy.render = false;
 	}
 
-	if (player.hitPoints <= 0 && player_dead_counter < 7) {
+	if (player.hitPoints <= 0 && player.dead_counter < 7) {
 		player.state = 'deadright';
-		player_dead_counter++;
+		player.dead_counter++;
 	}
 
-	if (player.hitPoints <= 0 && player_dead_counter >= 7) {
+	if (player.hitPoints <= 0 && player.dead_counter >= 7) {
 		playerFrameX = 384;
 		playerFrameY = 256;
-		player_dead_counter++;
+		player.dead_counter++;
 	}
 
-	if (player_dead_counter > 100) {
-		player.render = false;
+	if (player.dead_counter > 100) {
+		return;
 	}
 
 	//speed corrections for diagonal and when map moves
@@ -212,22 +212,6 @@ function animateGame() {
 		map.mapMoving = true;
 		map.positionY += temp_speed;
 	}
-	console.log(
-		// player.positionX,
-		// player.positionY
-		// enemy.positionX,
-		// enemy.positionY,
-		// distance,
-		// player.hitPoints
-		// map.positionX,
-		// map.positionY,
-		// map.mapMoving
-		// temp_speed,
-		// enemy_temp_speed,
-		player.hitPoints
-		// player_dead_counter,
-		// enemy
-	);
 
 	let health = document.getElementById('health');
 	health.innerText = `Health: ${player.hitPoints}`;
@@ -235,7 +219,9 @@ function animateGame() {
 	let experience = document.getElementById('experience');
 	experience.innerText = `Experience: ${player.experience}`;
 
-	//0, 86-108
+	//clear canvas
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
 	//render map
 	ctx.drawImage(
 		map.image,
@@ -284,11 +270,6 @@ function animateGame() {
 	//recursively call animations
 	requestAnimationFrame(animateGame);
 }
-
-//call animation function
-
-
-	// document.body.innerHTML += '<div id="experience">adsf</div>';
 
 //keydown inputs for player movement and attacks
 window.addEventListener(
@@ -384,3 +365,20 @@ window.addEventListener('keyup', function (event) {
 		player.state = 'idleright';
 	}
 });
+
+// console.log
+// player.positionX,
+// player.positionY
+// enemy.positionX,
+// enemy.positionY,
+// distance,
+// player.hitPoints
+// map.positionX,
+// map.positionY,
+// map.mapMoving
+// temp_speed,
+// enemy_temp_speed,
+// player.hitPoints
+// player.dead_counter,
+// enemy
+// ();
