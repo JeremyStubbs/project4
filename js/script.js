@@ -160,7 +160,6 @@ function animateGame() {
 		player.positionY > map.endPositionY - 10
 	) {
 		endOfLevel = true;
-		// console.log(1, endOfLevel)
 	}
 	if (endOfLevel) {
 		return;
@@ -193,19 +192,19 @@ function animateGame() {
 			player.attackCounter = 0;
 			if (
 				player.state == 'attackright' &&
-				player.positionY - enemy.positionY < 5 &&
-				player.positionY - enemy.positionY > -5 &&
-				player.positionX - enemy.positionX > -player.attackDistance &&
-				player.positionX - enemy.positionX < 0
+				deltaY < 5 &&
+				deltaY > -5 &&
+				deltaX > -player.attackDistance &&
+				deltaX < 0
 			) {
 				enemy.hitPoints -= player.attackDamage;
 			}
 			if (
 				player.state == 'attackleft' &&
-				player.positionY - enemy.positionY < 5 &&
-				player.positionY - enemy.positionY > -5 &&
-				player.positionX - enemy.positionX < player.attackDistance &&
-				player.positionX - enemy.positionX > 0
+				deltaY < 5 &&
+				deltaY > -5 &&
+				deltaX < player.attackDistance &&
+				deltaX > 0
 			) {
 				enemy.hitPoints -= player.attackDamage;
 			}
@@ -360,6 +359,7 @@ function animateGame() {
 			}
 
 			if (deltaX > 20) {
+				enemy.state = 'walkright';
 				enemy.positionX += enemy_temp_speed;
 			}
 			if (deltaX < -20) {

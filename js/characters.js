@@ -136,7 +136,7 @@ const enemy = new Character(
 	0,
 	0,
 	'right',
-	'walkright',
+	'attackback',
 	8,
 	[],
 	[
@@ -150,7 +150,7 @@ const enemy = new Character(
 		},
 		{
 			name: 'attackback',
-			frames: 11,
+			frames: 1,
 		},
 		{
 			name: 'walkleft',
