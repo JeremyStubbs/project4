@@ -16,13 +16,13 @@ const enemyInitialHP = enemy.hitPoints;
 
 //Animate start screen
 function startLoad() {
-	requestAnimationFrame(() => {
-		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-		ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
-	});
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+	requestAnimationFrame(startLoad);
 }
 
-startLoad();
+requestAnimationFrame(startLoad);
+
 //make a map class
 class Map {
 	constructor(
@@ -147,6 +147,11 @@ function restart() {
 //Animation function
 function animateGame() {
 	// console.log('animating');
+	// let i = 0;
+	// while (i < 10002) {
+	// 	console.log('whileloop');
+	// 	i++;
+	// }
 	//check if game over and display end screen
 	if (
 		player.positionX < 5 &&
@@ -523,6 +528,9 @@ window.addEventListener('keyup', function (event) {
 // Array.from(new Array(23), (x, i) => i + 86);
 setInterval(() => {
 	// console.log('settingInterval');
+	// setInterval(() => {
+	// 	console.log('timeout');
+	// }, 500);
 	if (restartValue == true) {
 		endOfLevel = false;
 		restartValue = false;
