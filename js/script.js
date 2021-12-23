@@ -16,10 +16,13 @@ const enemyInitialHP = enemy.hitPoints;
 
 //Animate start screen
 function startLoad() {
-	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+	requestAnimationFrame(() => {
+		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+	});
 }
-requestAnimationFrame(startLoad);
 
+startLoad();
 //make a map class
 class Map {
 	constructor(
@@ -124,7 +127,7 @@ let restartValue = false;
 function restart() {
 	restartValue = true;
 	endOfLevel = true;
-	// console.log('first', restartValue, endOfLevel, player.hitPoints);
+	// console.log('restart');
 	player.positionX = map.playerStartPositionX;
 	player.positionY = map.playerStartPositionY;
 	enemy.positionX = map.enemyStartPositionX;
@@ -143,7 +146,7 @@ function restart() {
 
 //Animation function
 function animateGame() {
-	// console.log('animating', restartValue, endOfLevel, player.hitPoints);
+	// console.log('animating');
 	//check if game over and display end screen
 	if (
 		player.positionX < 5 &&
@@ -245,7 +248,6 @@ function animateGame() {
 
 	if (player.dead_counter > 100) {
 		endOfLevel = true;
-
 	}
 
 	//speed correction for diagonal
@@ -425,6 +427,7 @@ function animateGame() {
 window.addEventListener(
 	'keydown',
 	function (event) {
+		// console.log('first');
 		if (event.defaultPrevented) {
 			return; // Do nothing if the event was already processed
 		}
@@ -494,6 +497,7 @@ window.addEventListener(
 				player.state = 'attackright';
 			}
 		}
+		// console.log('last');
 		// Cancel the default action to avoid it being handled twice
 		event.preventDefault();
 	},
@@ -502,6 +506,7 @@ window.addEventListener(
 
 //keyup inputs to reset
 window.addEventListener('keyup', function (event) {
+	// console.log('keyup')
 	player.walkingUp = false;
 	player.walkingDown = false;
 	player.walkingRight = false;
@@ -517,7 +522,7 @@ window.addEventListener('keyup', function (event) {
 
 // Array.from(new Array(23), (x, i) => i + 86);
 setInterval(() => {
-	// console.log('settingInterval', restartValue, endOfLevel, player.hitPoints);
+	// console.log('settingInterval');
 	if (restartValue == true) {
 		endOfLevel = false;
 		restartValue = false;
