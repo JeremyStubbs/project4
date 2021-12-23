@@ -4,7 +4,7 @@ I will build a 2D RPG game using HTML5, CSS and vanilla javascript. For the firs
 
 ## Project Links
 
-https://jeremystubbs.github.io/Project4
+https://jeremystubbs.github.io/project4/
 
 ## Wireframes
 
