@@ -118,7 +118,7 @@ function startGame() {
 		document.getElementById('instructions').style.display = 'none';
 		document.getElementById('map1').style.display = 'none';
 		document.getElementById('map2').style.display = 'none';
-		animateGame();
+		requestAnimationFrame(animateGame);
 	}
 }
 
@@ -534,6 +534,6 @@ setInterval(() => {
 	if (restartValue == true) {
 		endOfLevel = false;
 		restartValue = false;
-		animateGame();
+		requestAnimationFrame(animateGame);
 	}
 }, 1000);
