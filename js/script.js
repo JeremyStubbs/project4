@@ -135,6 +135,10 @@ function restart() {
 	player.experience = initialExperience;
 	player.state = 'idleleft';
 	enemy.state = 'walkright';
+	enemy.dead_counter = 0;
+	enemy.render = true;
+	enemy.hitPoints = enemyInitialHP;
+	player.dead_counter = 0;
 }
 
 //Animation function
@@ -241,7 +245,7 @@ function animateGame() {
 
 	if (player.dead_counter > 100) {
 		endOfLevel = true;
-		player.dead_counter = 0;
+
 	}
 
 	//speed correction for diagonal
