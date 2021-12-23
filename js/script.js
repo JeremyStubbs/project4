@@ -61,7 +61,6 @@ class Map {
 let pickedMap = false;
 let map;
 function mapStuff(choice) {
-	console.log(choice);
 	pickedMap = true;
 	if (choice == 1) {
 		map = new Map(
@@ -121,12 +120,11 @@ function startGame() {
 }
 
 //reset all parameters
+let restartValue = false;
 function restart() {
-	// endOfLevel = false;
-	// requestAnimationFrame(() => {
-	// 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-	// 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
-	// });
+	restartValue = true;
+	endOfLevel = true;
+	// console.log('first', restartValue, endOfLevel, player.hitPoints);
 	player.positionX = map.playerStartPositionX;
 	player.positionY = map.playerStartPositionY;
 	enemy.positionX = map.enemyStartPositionX;
@@ -137,11 +135,11 @@ function restart() {
 	player.experience = initialExperience;
 	player.state = 'idleleft';
 	enemy.state = 'walkright';
-	// animateGame;
 }
 
 //Animation function
 function animateGame() {
+	// console.log('animating', restartValue, endOfLevel, player.hitPoints);
 	//check if game over and display end screen
 	if (
 		player.positionX < 5 &&
@@ -149,6 +147,7 @@ function animateGame() {
 		player.positionY > map.endPositionY - 10
 	) {
 		endOfLevel = true;
+		// console.log(1, endOfLevel)
 	}
 	if (endOfLevel) {
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -242,6 +241,7 @@ function animateGame() {
 
 	if (player.dead_counter > 100) {
 		endOfLevel = true;
+		player.dead_counter = 0;
 	}
 
 	//speed correction for diagonal
@@ -512,3 +512,11 @@ window.addEventListener('keyup', function (event) {
 });
 
 // Array.from(new Array(23), (x, i) => i + 86);
+setInterval(() => {
+	// console.log('settingInterval', restartValue, endOfLevel, player.hitPoints);
+	if (restartValue == true) {
+		endOfLevel = false;
+		restartValue = false;
+		animateGame();
+	}
+}, 1000);
