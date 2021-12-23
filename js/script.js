@@ -23,6 +23,12 @@ function startLoad() {
 
 requestAnimationFrame(startLoad);
 
+function endLoad() {
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
+	requestAnimationFrame(endLoad);
+}
+
 //make a map class
 class Map {
 	constructor(
@@ -146,12 +152,6 @@ function restart() {
 
 //Animation function
 function animateGame() {
-	// console.log('animating');
-	// let i = 0;
-	// while (i < 10002) {
-	// 	console.log('whileloop');
-	// 	i++;
-	// }
 	//check if game over and display end screen
 	if (
 		player.positionX < 5 &&
@@ -162,8 +162,6 @@ function animateGame() {
 		// console.log(1, endOfLevel)
 	}
 	if (endOfLevel) {
-		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-		ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
 		return;
 	}
 
@@ -527,11 +525,11 @@ window.addEventListener('keyup', function (event) {
 
 // Array.from(new Array(23), (x, i) => i + 86);
 setInterval(() => {
-	// console.log('settingInterval');
-	// setInterval(() => {
-	// 	console.log('timeout');
-	// }, 500);
-	if (restartValue == true) {
+	// console.log(restartValue, endOfLevel)
+	if (endOfLevel && restartValue == false) {
+		requestAnimationFrame(endLoad);
+	}
+	if (restartValue) {
 		endOfLevel = false;
 		restartValue = false;
 		requestAnimationFrame(animateGame);
