@@ -6,17 +6,37 @@ const CANVAS_HEIGHT = (canvas.height = 600);
 
 //make a map class
 class Map {
-	constructor(imgSRC, positionX, positionY) {
+	constructor(
+		imgSRC,
+		positionX,
+		positionY,
+		boundaryX,
+		boundaryY,
+		endPositionX,
+		endPositionY
+	) {
 		this.image = new Image();
 		this.image.src = imgSRC;
 		this.positionX = positionX;
 		this.positionY = positionY;
 		this.mapMoving = false;
+		this.boundaryX = boundaryX;
+		this.boundaryY = boundaryY;
+		this.endPositionX = endPositionX;
+		this.endPositionY = endPositionY;
 	}
 }
 
 //make a map
-map = new Map('img/map.png', 242, 116);
+map = new Map(
+	'img/map.png',
+	242,
+	116,
+	242,
+	116,
+	[0],
+	Array.from(new Array(23), (x, i) => i + 86)
+);
 
 // let startedLevel = false;
 let endOfLevel = false;
@@ -35,6 +55,7 @@ function startGame() {
 	document.getElementById('restart').style.display = 'block';
 	document.getElementById('health').style.display = 'block';
 	document.getElementById('experience').style.display = 'block';
+	document.getElementById('start').style.display = 'none';
 }
 
 requestAnimationFrame(startLoad);
@@ -43,9 +64,8 @@ requestAnimationFrame(startLoad);
 function animateGame() {
 	//check if game over
 	if (
-		player.positionX <= 0 &&
-		player.positionY >= 86 &&
-		player.positionY <= 108
+		map.endPositionX.includes(player.positionX) &&
+		map.endPositionY.includes(player.positionY)
 	) {
 		endOfLevel = true;
 	}
@@ -113,7 +133,7 @@ function animateGame() {
 		}
 	}
 
-	//enemy or player dies when hit points below 0. After number of frames in animation, stop animation. After another set of frames, character disappears because I haven't figured out how to make corpse stay where it lay.
+	//enemy or player dies when hit points below 0. After number of frames in animation, stop animation. After another set of frames, character disappears.
 	if (enemy.hitPoints <= 0 && enemy.dead_counter < 5) {
 		enemy.dead_counter++;
 		enemy.state = 'dead';
@@ -176,13 +196,21 @@ function animateGame() {
 	if (player.walkingDown && player.positionY < 450) {
 		player.positionY += temp_speed;
 	}
-	if (player.walkingDown && player.positionY >= 450 && map.positionY >= 116) {
+	if (
+		player.walkingDown &&
+		player.positionY >= 450 &&
+		map.positionY >= map.boundaryY
+	) {
 		player.positionY += temp_speed;
 	}
 	if (player.walkingRight && player.positionX < 460) {
 		player.positionX += temp_speed;
 	}
-	if (player.walkingRight && player.positionX >= 460 && map.positionX >= 242) {
+	if (
+		player.walkingRight &&
+		player.positionX >= 460 &&
+		map.positionX >= map.boundaryX
+	) {
 		player.positionX += temp_speed;
 	}
 	if (player.walkingLeft && player.positionX > 90) {
@@ -227,7 +255,11 @@ function animateGame() {
 		map.mapMoving = true;
 		map.positionX -= temp_speed;
 	}
-	if (player.positionX >= 460 && player.walkingRight && map.positionX < 242) {
+	if (
+		player.positionX >= 460 &&
+		player.walkingRight &&
+		map.positionX < map.boundaryX
+	) {
 		map.mapMoving = true;
 		map.positionX += temp_speed;
 	}
@@ -236,11 +268,16 @@ function animateGame() {
 		map.positionY -= temp_speed;
 	}
 
-	if (player.positionY >= 450 && player.walkingDown && map.positionY < 116) {
+	if (
+		player.positionY >= 450 &&
+		player.walkingDown &&
+		map.positionY < map.boundaryY
+	) {
 		map.mapMoving = true;
 		map.positionY += temp_speed;
 	}
 
+	//adjust health and experience
 	let health = document.getElementById('health');
 	health.innerText = `Health: ${player.hitPoints}`;
 
@@ -298,7 +335,6 @@ function animateGame() {
 	//recursively call animations
 	requestAnimationFrame(animateGame);
 }
-
 
 //keydown inputs for player movement and attacks
 window.addEventListener(
