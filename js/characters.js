@@ -64,6 +64,7 @@ class Character {
 	}
 }
 
+// function makeCharacters(){}
 const player = new Character(
 	'img/dwarf.png',
 	64,

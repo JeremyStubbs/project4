@@ -18,6 +18,8 @@ class Map {
 		playerStartPositionY,
 		enemyStartPositionX,
 		enemyStartPositionY,
+		mapStartPositionX,
+		mapStartPositionY,
 		mapScale
 	) {
 		this.image = new Image();
@@ -34,44 +36,53 @@ class Map {
 		this.enemyStartPositionX = enemyStartPositionX;
 		this.enemyStartPositionY = enemyStartPositionY;
 		this.mapScale = mapScale;
+		this.mapStartPositionX = mapStartPositionX;
+		this.mapStartPositionY = mapStartPositionY;
 	}
 }
 
 //make a map
+map = new Map(
+	'img/map.png',
+	0,
+	0,
+	242,
+	116,
+	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+	Array.from(new Array(23), (x, i) => i + 86),
+	155,
+	458,
+	-50,
+	0,
+	242,
+	116,
+	2
+);
+
 // map = new Map(
-// 	'img/map.png',
+// 	'img/beach.png',
 // 	242,
 // 	116,
 // 	242,
 // 	116,
 // 	[0],
-// 	Array.from(new Array(23), (x, i) => i + 86),
-// 	155,
-// 458,
-// 	-50,
-// 	0,
-// 2
+// 	Array.from(new Array(23), (x, i) => i + 420),
+// 	450,
+// 	450,
+// 	200,
+// 	580,
+// 	2
 // );
-
-map = new Map(
-	'img/beach.png',
-	242,
-	116,
-	242,
-	116,
-	[0],
-	Array.from(new Array(23), (x, i) => i + 420),
-	450,
-	450,
-	200,
-	580,
-	2
-);
 
 player.positionX = map.playerStartPositionX;
 player.positionY = map.playerStartPositionY;
 enemy.positionX = map.enemyStartPositionX;
 enemy.positionY = map.enemyStartPositionY;
+map.positionX = map.mapStartPositionX;
+map.positionY = map.mapStartPositionY;
+const initialHP = player.hitPoints;
+const initialExperience = player.experience;
+const enemyInitialHP = enemy.hitPoints;
 
 // let startedLevel = false;
 let endOfLevel = false;
@@ -93,6 +104,24 @@ function startGame() {
 	document.getElementById('health').style.display = 'block';
 	document.getElementById('experience').style.display = 'block';
 	document.getElementById('start').style.display = 'none';
+	document.getElementById('instructions').style.display = 'none';
+}
+
+function restart() {
+	player.positionX = map.playerStartPositionX;
+	player.positionY = map.playerStartPositionY;
+	enemy.positionX = map.enemyStartPositionX;
+	enemy.positionY = map.enemyStartPositionY;
+	map.positionX = map.mapStartPositionX;
+	map.positionY = map.mapStartPositionY;
+	player.hitPoints = initialHP;
+	player.experience = initialExperience;
+	player.state = 'idleleft';
+	enemy.state = 'walkright';
+	if (endOfLevel) {
+		endOfLevel = false;
+		animateGame();
+	}
 }
 
 //Animation function
