@@ -4,6 +4,22 @@ const ctx = canvas.getContext('2d');
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
+//Set game parameters
+let endOfLevel = false;
+let startScreen = new Image();
+let endScreen = new Image();
+endScreen.src = 'img/gameover.png';
+startScreen.src = 'img/start.png';
+const initialHP = player.hitPoints;
+const initialExperience = player.experience;
+const enemyInitialHP = enemy.hitPoints;
+
+//Animate start screen
+function startLoad() {
+	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+}
+requestAnimationFrame(startLoad);
+
 //make a map class
 class Map {
 	constructor(
@@ -42,72 +58,75 @@ class Map {
 }
 
 //make a map
-map = new Map(
-	'img/map.png',
-	0,
-	0,
-	242,
-	116,
-	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-	Array.from(new Array(23), (x, i) => i + 86),
-	155,
-	458,
-	-50,
-	0,
-	242,
-	116,
-	2
-);
-
-// map = new Map(
-// 	'img/beach.png',
-// 	242,
-// 	116,
-// 	242,
-// 	116,
-// 	[0],
-// 	Array.from(new Array(23), (x, i) => i + 420),
-// 	450,
-// 	450,
-// 	200,
-// 	580,
-// 	2
-// );
-
-player.positionX = map.playerStartPositionX;
-player.positionY = map.playerStartPositionY;
-enemy.positionX = map.enemyStartPositionX;
-enemy.positionY = map.enemyStartPositionY;
-map.positionX = map.mapStartPositionX;
-map.positionY = map.mapStartPositionY;
-const initialHP = player.hitPoints;
-const initialExperience = player.experience;
-const enemyInitialHP = enemy.hitPoints;
-
-// let startedLevel = false;
-let endOfLevel = false;
-
-let startScreen = new Image();
-let endScreen = new Image();
-
-endScreen.src = 'img/gameover.png';
-startScreen.src = 'img/start.png';
-
-function startLoad() {
-	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
+let pickedMap = false;
+let map;
+function mapStuff(choice) {
+	console.log(choice);
+	pickedMap = true;
+	if (choice == 1) {
+		map = new Map(
+			'img/forrest.png',
+			0,
+			0,
+			242,
+			116,
+			0,
+			100,
+			155,
+			458,
+			-50,
+			0,
+			242,
+			116,
+			2
+		);
+	} else if (choice == 2) {
+		map = new Map(
+			'img/beach.png',
+			242,
+			116,
+			242,
+			116,
+			0,
+			480,
+			450,
+			450,
+			200,
+			580,
+			242,
+			116,
+			2
+		);
+	}
+	player.positionX = map.playerStartPositionX;
+	player.positionY = map.playerStartPositionY;
+	enemy.positionX = map.enemyStartPositionX;
+	enemy.positionY = map.enemyStartPositionY;
+	map.positionX = map.mapStartPositionX;
+	map.positionY = map.mapStartPositionY;
 }
 
-requestAnimationFrame(startLoad);
-
+//start game
 function startGame() {
-	document.getElementById('restart').style.display = 'block';
-	document.getElementById('health').style.display = 'block';
-	document.getElementById('experience').style.display = 'block';
-	document.getElementById('start').style.display = 'none';
-	document.getElementById('instructions').style.display = 'none';
+	if (pickedMap) {
+		document.getElementById('restart').style.display = 'block';
+		document.getElementById('health').style.display = 'block';
+		document.getElementById('experience').style.display = 'block';
+		document.getElementById('start').style.display = 'none';
+		document.getElementById('instructions').style.display = 'none';
+		document.getElementById('map1').style.display = 'none';
+		document.getElementById('map2').style.display = 'none';
+		animateGame();
+	}
 }
 
+//reset all parameters
 function restart() {
+	// endOfLevel = false;
+	// requestAnimationFrame(() => {
+	// 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	// 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
+	// });
 	player.positionX = map.playerStartPositionX;
 	player.positionY = map.playerStartPositionY;
 	enemy.positionX = map.enemyStartPositionX;
@@ -118,18 +137,17 @@ function restart() {
 	player.experience = initialExperience;
 	player.state = 'idleleft';
 	enemy.state = 'walkright';
-	if (endOfLevel) {
-		endOfLevel = false;
-		animateGame();
-	}
+	// animateGame;
 }
 
 //Animation function
 function animateGame() {
+	//making it work with limited knowledge
 	//check if game over
 	if (
-		map.endPositionX.includes(player.positionX) &&
-		map.endPositionY.includes(player.positionY)
+		player.positionX < 5 &&
+		player.positionY < map.endPositionY + 10 &&
+		player.positionY > map.endPositionY - 10
 	) {
 		endOfLevel = true;
 	}
@@ -511,3 +529,6 @@ window.addEventListener('keyup', function (event) {
 // player.dead_counter,
 // enemy
 // ();
+// Array.from(new Array(23), (x, i) => i + 86);
+
+//
