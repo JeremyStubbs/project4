@@ -23,6 +23,7 @@ function startLoad() {
 
 requestAnimationFrame(startLoad);
 
+//Call this to animate end screen
 function endLoad() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
@@ -362,6 +363,7 @@ function animateGame() {
 				enemy.positionX += enemy_temp_speed;
 			}
 			if (deltaX < -20) {
+				enemy.state = 'walkleft';
 				enemy.positionX -= enemy_temp_speed;
 			}
 		}
