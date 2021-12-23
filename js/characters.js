@@ -15,7 +15,9 @@ class Character {
 		attackDamage,
 		attackSpeed,
 		attackDistance,
-		experience
+		experience,
+		endX,
+		endY
 	) {
 		this.characterImage = new Image();
 		this.characterImage.src = imgSRC;
@@ -42,7 +44,9 @@ class Character {
 		this.attackSpeed = attackSpeed;
 		this.attackDistance = attackDistance;
 		this.render = true;
-        this.dead_counter =0;
+		this.dead_counter = 0;
+		this.endX = endX;
+		this.endY = endY;
 	}
 	initialize() {
 		this.animationStates.forEach((state, index) => {
@@ -64,8 +68,8 @@ const player = new Character(
 	'img/dwarf.png',
 	64,
 	64,
-	155,
-	458,
+	0,
+	0,
 	'right',
 	'idleleft',
 	8,
@@ -117,7 +121,9 @@ const player = new Character(
 	30,
 	40,
 	40,
-	0
+	0,
+	384,
+	256
 );
 
 player.initialize();
@@ -126,7 +132,7 @@ const enemy = new Character(
 	'img/goblin.png',
 	64,
 	64,
-	-50,
+	0,
 	0,
 	'right',
 	'walkright',
@@ -159,7 +165,9 @@ const enemy = new Character(
 	20,
 	50,
 	50,
-	20
+	20,
+	256,
+	256
 );
 
 enemy.initialize();

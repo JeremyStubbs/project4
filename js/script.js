@@ -13,7 +13,12 @@ class Map {
 		boundaryX,
 		boundaryY,
 		endPositionX,
-		endPositionY
+		endPositionY,
+		playerStartPositionX,
+		playerStartPositionY,
+		enemyStartPositionX,
+		enemyStartPositionY,
+		mapScale
 	) {
 		this.image = new Image();
 		this.image.src = imgSRC;
@@ -24,19 +29,49 @@ class Map {
 		this.boundaryY = boundaryY;
 		this.endPositionX = endPositionX;
 		this.endPositionY = endPositionY;
+		this.playerStartPositionX = playerStartPositionX;
+		this.playerStartPositionY = playerStartPositionY;
+		this.enemyStartPositionX = enemyStartPositionX;
+		this.enemyStartPositionY = enemyStartPositionY;
+		this.mapScale = mapScale;
 	}
 }
 
 //make a map
+// map = new Map(
+// 	'img/map.png',
+// 	242,
+// 	116,
+// 	242,
+// 	116,
+// 	[0],
+// 	Array.from(new Array(23), (x, i) => i + 86),
+// 	155,
+// 458,
+// 	-50,
+// 	0,
+// 2
+// );
+
 map = new Map(
-	'img/map.png',
+	'img/beach.png',
 	242,
 	116,
 	242,
 	116,
 	[0],
-	Array.from(new Array(23), (x, i) => i + 86)
+	Array.from(new Array(23), (x, i) => i + 420),
+	450,
+	450,
+	200,
+	580,
+	2
 );
+
+player.positionX = map.playerStartPositionX;
+player.positionY = map.playerStartPositionY;
+enemy.positionX = map.enemyStartPositionX;
+enemy.positionY = map.enemyStartPositionY;
 
 // let startedLevel = false;
 let endOfLevel = false;
@@ -51,14 +86,14 @@ function startLoad() {
 	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
 }
 
+requestAnimationFrame(startLoad);
+
 function startGame() {
 	document.getElementById('restart').style.display = 'block';
 	document.getElementById('health').style.display = 'block';
 	document.getElementById('experience').style.display = 'block';
 	document.getElementById('start').style.display = 'none';
 }
-
-requestAnimationFrame(startLoad);
 
 //Animation function
 function animateGame() {
@@ -140,8 +175,8 @@ function animateGame() {
 		player.experience += enemy.experience;
 	}
 	if (enemy.hitPoints <= 0 && enemy.dead_counter >= 5) {
-		enemyFrameX = 256;
-		enemyFrameX = 256;
+		enemyFrameX = enemy.endX;
+		enemyFrameX = enemy.endY;
 		enemy.dead_counter++;
 	}
 	if (enemy.hitPoints <= 0 && enemy.dead_counter > 20) {
@@ -154,8 +189,8 @@ function animateGame() {
 	}
 
 	if (player.hitPoints <= 0 && player.dead_counter >= 7) {
-		playerFrameX = 384;
-		playerFrameY = 256;
+		playerFrameX = player.endX;
+		playerFrameY = player.endY;
 		player.dead_counter++;
 	}
 
@@ -296,8 +331,8 @@ function animateGame() {
 		map.image.height,
 		0,
 		0,
-		map.image.width * 2,
-		map.image.height * 2
+		map.image.width * map.mapScale,
+		map.image.height * map.mapScale
 	);
 
 	//render player and enemy
