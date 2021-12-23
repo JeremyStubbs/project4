@@ -1,6 +1,6 @@
+//Set up canvas
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-
 const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
@@ -57,7 +57,7 @@ class Map {
 	}
 }
 
-//make a map
+//choose and make map
 let pickedMap = false;
 let map;
 function mapStuff(choice) {
@@ -106,7 +106,7 @@ function mapStuff(choice) {
 	map.positionY = map.mapStartPositionY;
 }
 
-//start game
+//start game if picked map and clean up screen
 function startGame() {
 	if (pickedMap) {
 		document.getElementById('restart').style.display = 'block';
@@ -142,8 +142,7 @@ function restart() {
 
 //Animation function
 function animateGame() {
-	//making it work with limited knowledge
-	//check if game over
+	//check if game over and display end screen
 	if (
 		player.positionX < 5 &&
 		player.positionY < map.endPositionY + 10 &&
@@ -215,7 +214,7 @@ function animateGame() {
 		}
 	}
 
-	//enemy or player dies when hit points below 0. After number of frames in animation, stop animation. After another set of frames, character disappears.
+	//enemy or player dies when hit points below 0. After set number of frames in animation, stop animation so that death sequence doesn't repeat. After another set of frames, character disappears.
 	if (enemy.hitPoints <= 0 && enemy.dead_counter < 5) {
 		enemy.dead_counter++;
 		enemy.state = 'dead';
@@ -245,7 +244,7 @@ function animateGame() {
 		endOfLevel = true;
 	}
 
-	//speed corrections for diagonal and when map moves
+	//speed correction for diagonal
 	let temp_speed = player.speed;
 	if (
 		(player.walkingUp || player.walkingDown) &&
@@ -302,35 +301,6 @@ function animateGame() {
 		player.positionX -= temp_speed;
 	}
 
-	//enemy movements
-	//set enemy speed
-	let enemy_temp_speed = temp_speed * enemy.speed;
-
-	//check if not already dead then
-	if (enemy.state != 'dead') {
-		//will pursue player when distance less than 200 px
-		if (distance < 200) {
-			//reverse speed if map is moving. works because player speed is twice as large as enemy speed. any other difference would require some math.
-			if (map.mapMoving) {
-				enemy_temp_speed = -enemy_temp_speed;
-			}
-
-			if (deltaY > 2) {
-				enemy.positionY += enemy_temp_speed;
-			}
-			if (deltaY < -2) {
-				enemy.positionY -= enemy_temp_speed;
-			}
-
-			if (deltaX > 20) {
-				enemy.positionX += enemy_temp_speed;
-			}
-			if (deltaX < -20) {
-				enemy.positionX -= enemy_temp_speed;
-			}
-		}
-	}
-
 	//map movement
 	map.mapMoving = false;
 	if (player.positionX <= 90 && player.walkingLeft && map.positionX > 0) {
@@ -357,6 +327,35 @@ function animateGame() {
 	) {
 		map.mapMoving = true;
 		map.positionY += temp_speed;
+	}
+
+	//enemy movements
+	//set enemy speed as percentage of player's
+	let enemy_temp_speed = temp_speed * enemy.speed;
+
+	//check if enemy not already dead then
+	if (enemy.state != 'dead') {
+		//will pursue player when distance less than 200 px
+		if (distance < 200) {
+			//reverse speed if map is moving. sort of works only when enemy is behind you because player speed is twice as large as enemy speed. need to fix this is future.
+			if (map.mapMoving) {
+				enemy_temp_speed = -enemy_temp_speed;
+			}
+
+			if (deltaY > 2) {
+				enemy.positionY += enemy_temp_speed;
+			}
+			if (deltaY < -2) {
+				enemy.positionY -= enemy_temp_speed;
+			}
+
+			if (deltaX > 20) {
+				enemy.positionX += enemy_temp_speed;
+			}
+			if (deltaX < -20) {
+				enemy.positionX -= enemy_temp_speed;
+			}
+		}
 	}
 
 	//adjust health and experience
@@ -414,11 +413,11 @@ function animateGame() {
 	player.gameFrame++;
 	enemy.gameFrame++;
 
-	//recursively call animations
+	//recursively animate
 	requestAnimationFrame(animateGame);
 }
 
-//keydown inputs for player movement and attacks
+//keydown inputs for player movement and attacks. Note these run entirely before animation resumes.
 window.addEventListener(
 	'keydown',
 	function (event) {
@@ -490,7 +489,6 @@ window.addEventListener(
 				player.beenAttacking = true;
 				player.state = 'attackright';
 			}
-			// console.log(enemy.hitPoints);
 		}
 		// Cancel the default action to avoid it being handled twice
 		event.preventDefault();
@@ -513,22 +511,4 @@ window.addEventListener('keyup', function (event) {
 	}
 });
 
-// console.log
-// player.positionX,
-// player.positionY
-// enemy.positionX,
-// enemy.positionY,
-// distance,
-// player.hitPoints
-// map.positionX,
-// map.positionY,
-// map.mapMoving
-// temp_speed,
-// enemy_temp_speed,
-// player.hitPoints
-// player.dead_counter,
-// enemy
-// ();
 // Array.from(new Array(23), (x, i) => i + 86);
-
-//

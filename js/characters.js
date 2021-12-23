@@ -60,11 +60,10 @@ class Character {
 			}
 			this.spriteAnimations[state.name] = frames;
 		});
-		// console.log(player.state);
 	}
 }
 
-// function makeCharacters(){}
+// create and initialize player
 const player = new Character(
 	'img/dwarf.png',
 	64,
@@ -129,6 +128,7 @@ const player = new Character(
 
 player.initialize();
 
+// create and initialize enemy
 const enemy = new Character(
 	'img/goblin.png',
 	64,
