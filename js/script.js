@@ -33,8 +33,11 @@ function endLoad() {
 	console.log('end screen up');
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
-	if (endOfLevel && gameNotStarted == false) {
-		document.getElementById('restart').style.display = 'block';
+	// if (endOfLevel && gameNotStarted == false) {
+	// 	document.getElementById('restart').style.display = 'block';
+	// 	requestAnimationFrame(endLoad);
+	// }
+	if (endOfLevel) {
 		requestAnimationFrame(endLoad);
 	}
 }
@@ -132,6 +135,7 @@ function startGame() {
 	if (pickedMap) {
 		document.getElementById('health').style.display = 'block';
 		document.getElementById('experience').style.display = 'block';
+		document.getElementById('restart').style.display = 'block';
 		document.getElementById('start').style.display = 'none';
 		document.getElementById('instructions').style.display = 'none';
 		document.getElementById('map1').style.display = 'none';
@@ -142,8 +146,7 @@ function startGame() {
 
 //reset all parameters
 function restart() {
-	document.getElementById('restart').style.display = 'none';
-	endOfLevel = false;
+	// document.getElementById('restart').style.display = 'none';
 	player.positionX = map.playerStartPositionX;
 	player.positionY = map.playerStartPositionY;
 	enemy.positionX = map.enemyStartPositionX;
@@ -158,7 +161,10 @@ function restart() {
 	enemy.render = true;
 	enemy.hitPoints = enemyInitialHP;
 	player.dead_counter = 0;
-	requestAnimationFrame(animateGame);
+	if (endOfLevel) {
+		endOfLevel = false;
+		requestAnimationFrame(animateGame);
+	}
 }
 
 //Animation function
@@ -538,11 +544,3 @@ window.addEventListener('keyup', function (event) {
 });
 
 // Array.from(new Array(23), (x, i) => i + 86);
-// setInterval(() => {
-
-// 	if (restartValue) {
-// 		endOfLevel = false;
-// 		restartValue = false;
-// 		requestAnimationFrame(animateGame);
-// 	}
-// }, 1000);
