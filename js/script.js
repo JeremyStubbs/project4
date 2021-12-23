@@ -30,17 +30,18 @@ startScreen.src = 'img/start.png';
 function startLoad() {
 	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
 }
-// function endLoad() {
-// 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-// 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
-// }
 
-// if (startedLevel === false) {
+function startGame() {
+	document.getElementById('restart').style.display = 'block';
+	document.getElementById('health').style.display = 'block';
+	document.getElementById('experience').style.display = 'block';
+}
+
 requestAnimationFrame(startLoad);
-// }
 
 //Animation function
 function animateGame() {
+	//check if game over
 	if (
 		player.positionX <= 0 &&
 		player.positionY >= 86 &&
@@ -298,9 +299,6 @@ function animateGame() {
 	requestAnimationFrame(animateGame);
 }
 
-if (endOfLevel === true) {
-	requestAnimationFrame(endLoad);
-}
 
 //keydown inputs for player movement and attacks
 window.addEventListener(
