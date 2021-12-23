@@ -5,7 +5,7 @@ const CANVAS_WIDTH = (canvas.width = 600);
 const CANVAS_HEIGHT = (canvas.height = 600);
 
 //Set game parameters
-let endOfLevel = false;
+
 let startScreen = new Image();
 let endScreen = new Image();
 endScreen.src = 'img/gameover.png';
@@ -15,20 +15,31 @@ const initialExperience = player.experience;
 const enemyInitialHP = enemy.hitPoints;
 
 //Animate start screen
+let gameNotStarted = true;
 function startLoad() {
+	console.log('start screen up');
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	ctx.drawImage(startScreen, 0, 0, 852, 480, 0, 0, 600, 600);
-	requestAnimationFrame(startLoad);
+	if (gameNotStarted) {
+		requestAnimationFrame(startLoad);
+	}
 }
 
 requestAnimationFrame(startLoad);
 
 //Call this to animate end screen
+let endOfLevel = false;
 function endLoad() {
+	console.log('end screen up');
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	ctx.drawImage(endScreen, 0, 0, 480, 360, 0, 0, 600, 600);
-	requestAnimationFrame(endLoad);
+	if (endOfLevel && gameNotStarted == false) {
+		document.getElementById('restart').style.display = 'block';
+		requestAnimationFrame(endLoad);
+	}
 }
+
+requestAnimationFrame(endLoad);
 
 //make a map class
 class Map {
@@ -117,8 +128,8 @@ function mapStuff(choice) {
 
 //start game if picked map and clean up screen
 function startGame() {
+	gameNotStarted = false;
 	if (pickedMap) {
-		document.getElementById('restart').style.display = 'block';
 		document.getElementById('health').style.display = 'block';
 		document.getElementById('experience').style.display = 'block';
 		document.getElementById('start').style.display = 'none';
@@ -130,11 +141,9 @@ function startGame() {
 }
 
 //reset all parameters
-let restartValue = false;
 function restart() {
-	restartValue = true;
-	endOfLevel = true;
-	// console.log('restart');
+	document.getElementById('restart').style.display = 'none';
+	endOfLevel = false;
 	player.positionX = map.playerStartPositionX;
 	player.positionY = map.playerStartPositionY;
 	enemy.positionX = map.enemyStartPositionX;
@@ -149,6 +158,7 @@ function restart() {
 	enemy.render = true;
 	enemy.hitPoints = enemyInitialHP;
 	player.dead_counter = 0;
+	requestAnimationFrame(animateGame);
 }
 
 //Animation function
@@ -162,8 +172,10 @@ function animateGame() {
 		endOfLevel = true;
 	}
 	if (endOfLevel) {
+		requestAnimationFrame(endLoad);
 		return;
 	}
+	console.log('animating');
 
 	//set sprite images
 	let playerSpritePosition =
@@ -526,14 +538,11 @@ window.addEventListener('keyup', function (event) {
 });
 
 // Array.from(new Array(23), (x, i) => i + 86);
-setInterval(() => {
-	// console.log(restartValue, endOfLevel)
-	if (endOfLevel && restartValue == false) {
-		requestAnimationFrame(endLoad);
-	}
-	if (restartValue) {
-		endOfLevel = false;
-		restartValue = false;
-		requestAnimationFrame(animateGame);
-	}
-}, 1000);
+// setInterval(() => {
+
+// 	if (restartValue) {
+// 		endOfLevel = false;
+// 		restartValue = false;
+// 		requestAnimationFrame(animateGame);
+// 	}
+// }, 1000);

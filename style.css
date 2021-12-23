@@ -19,10 +19,10 @@
 	display: none;
 }
 
-#start{
-  display: block;
+#start {
+	display: block;
 }
-#instructions{
+#instructions {
 	width: 300px;
 	display: block;
 }
