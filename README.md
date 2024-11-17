@@ -1,10 +1,11 @@
+## Project Links
+
+https://jeremystubbs.github.io/project4/
+
 ## Project Description
 
 I will build a 2D RPG game using HTML5, CSS and vanilla javascript. For the first phase I want to build a single map, a single character and a single enemy with whom the character can do battle. The character will be a dwarf and the enemy a troll. The map will be a forrest in which the user must circumnavigate trees and rocks. When the user arrives to the page, they will be prompted with instructions and a button to start the game. The dwarf can be controlled with the up, down, right, and left arrows and can swing a battle ax with the enter button. When he approaches the edge of the screen, more of the map will appear. The objective is to reach an endpoint, a door out of the level. Obstacles near the end will funnel you to where a troll is hidden who will appear and begin to attack you. If you vanquish the troll, you can then exit the level. If time permits, the troll will drop loot which you can add to your inventory. The crux of the project, in my opinion, is the AI that controls the troll. I am fairly certain of how to write everything else. All images will be procured from open-sources, including the sprites used for the animations of the dwarf and the troll.
 
-## Project Links
-
-https://jeremystubbs.github.io/project4/
 
 ## Wireframes
 
